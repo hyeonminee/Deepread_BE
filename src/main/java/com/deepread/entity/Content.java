@@ -22,7 +22,7 @@ public class Content {
     @Lob
     private String content;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // enum 이름을 DB에 저장
     private User.Level level;
 
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -25,7 +25,7 @@ public class Summary {
     @JoinColumn(name = "content_id", nullable = false)
     private Content content;
 
-    @Lob
+    @Lob // Large Object. 대형 객체 데이터를 저장하기 위한 가변 길이 데이터 유형
     private String userSummary;
 
     private LocalDateTime submittedAt = LocalDateTime.now();

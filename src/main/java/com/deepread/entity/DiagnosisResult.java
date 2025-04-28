@@ -17,7 +17,7 @@ public class DiagnosisResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne // 연관관계 (N:1)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
