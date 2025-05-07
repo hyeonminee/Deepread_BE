@@ -29,11 +29,12 @@ public class MypageService {
         return userReportRepository.findByUserId(userId);
     }
 
-    // 회원 탈퇴 처리 (isDeleted true로 변경)
+    // 회원 탈퇴 처리
     @Transactional
-    public void withdrawUser(Long userId) {
-        userRepository.findById(userId).ifPresent(user -> {
+    public boolean withdrawUser(Long userId) {
+        return userRepository.findById(userId).map(user -> {
             user.setIsDeleted(true);
-        });
+            return true;
+        }).orElse(false);
     }
 }
