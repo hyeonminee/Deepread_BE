@@ -16,8 +16,8 @@ public class ContentController {
     private final ContentService contentService;
 
     // 사용자의 레벨에 따라 콘텐츠 추천
-    @GetMapping("/recommend/{level}") // @GetMapping("/recommend/{level}"): 사용자의 레벨에 따라 콘텐츠를 추천
-    public List<Content> getRecommendedContents(@PathVariable String level) {
+    @GetMapping("/recommend") // @GetMapping("/recommend"): 사용자의 레벨에 따라 콘텐츠를 추천
+    public List<Content> getRecommendedContents(@RequestParam String level) {
         return contentService.getRecommendedContents(User.Level.valueOf(level));
     }
 
