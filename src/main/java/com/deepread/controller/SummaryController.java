@@ -5,6 +5,8 @@ import com.deepread.entity.Content;
 import com.deepread.entity.Summary;
 import com.deepread.entity.SummaryFeedback;
 import com.deepread.service.SummaryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import com.deepread.entity.User;
@@ -21,6 +23,8 @@ public class SummaryController {
     private final EntityManager entityManager;
 
     // 사용자의 요약 제출 => 사용자가 작성한 요약 저장
+    @Operation(summary = "요약 제출", description = "사용자가 작성한 요약을 저장한다.")
+    @ApiResponse(responseCode = "200", description = "요약 저장 완료")
     @PostMapping
     public Summary submitSummary(@RequestBody SummaryDto dto) {
         // dto: 사용자가 작성한 요약
@@ -33,6 +37,8 @@ public class SummaryController {
     }
 
     // 특정 요약 조회
+    @Operation(summary = "요약 조회", description = "요약 ID를 통해 저장된 요약을 조회한다.")
+    @ApiResponse(responseCode = "200", description = "요약 반환")
     @GetMapping("/{id}")
     public Summary getSummary(@PathVariable Long id) {
         return summaryService.getSummaryById(id)
@@ -40,6 +46,8 @@ public class SummaryController {
     }
 
     // AI 피드백 저장 (요약 ID에 연결)
+    @Operation(summary = "AI 피드백 저장", description = "특정 요약에 대한 AI 피드백을 저장한다.")
+    @ApiResponse(responseCode = "200", description = "피드백 저장 완료")
     @PostMapping("/{id}/feedback")
     public SummaryFeedback saveFeedback(@PathVariable Long id, @RequestBody SummaryFeedback feedback) {
         Summary summary = summaryService.getSummaryById(id)
@@ -50,6 +58,8 @@ public class SummaryController {
     }
 
     // AI 피드백 조회
+    @Operation(summary = "AI 피드백 조회", description = "요약 ID를 통해 AI 피드백을 조회한다.")
+    @ApiResponse(responseCode = "200", description = "피드백 반환")
     @GetMapping("/{id}/feedback")
     public SummaryFeedback saveFeedback(@PathVariable Long id) {
         return summaryService.getFeedbackBySummaryId(id)
