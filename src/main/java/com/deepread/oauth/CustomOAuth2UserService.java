@@ -34,7 +34,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     User newUser = new User();
                     newUser.setSocialId(socialId);
                     newUser.setSocialProvider(User.SocialProvider.valueOf(provider));
-                    newUser.setUser_level(User.Level.초급); // 기본값
+                    newUser.setLevel(User.Level.초급); // 기본값
                     return userRepository.save(newUser);
                 });
 

@@ -30,7 +30,8 @@ public class User implements UserDetails {
     private String socialId;
 
     @Enumerated(EnumType.STRING)
-    private Level user_level = Level.초급;
+    @Column(name = "user_level")
+    private Level level = Level.초급;
 
     private String imageUrl;
 

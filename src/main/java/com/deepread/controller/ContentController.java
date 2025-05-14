@@ -2,6 +2,7 @@ package com.deepread.controller;
 
 import com.deepread.entity.User;
 import com.deepread.entity.Content;
+import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.service.ContentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,6 +30,6 @@ public class ContentController {
     @GetMapping("/{id}") // @GetMapping("/{id}"): 특정 ID의 콘텐츠 내용을 조회
     public Content getContentById(@PathVariable Long id) { // @PathVariable: URL 경로에 포함된 변수를 추출해 메서드 파라미터로 전달
         return contentService.getContentById(id)
-                .orElseThrow(() -> new RuntimeException("콘텐츠를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResourceNotFoundException("콘텐츠를 찾을 수 없습니다."));
     }
 }

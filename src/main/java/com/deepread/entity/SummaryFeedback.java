@@ -17,14 +17,18 @@ public class SummaryFeedback {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 연관된 요약
     @OneToOne
     @JoinColumn(name = "summary_id", nullable = false, unique = true)
     private Summary summary;
 
-    private Integer score;
+    // AI가 평가한 점수
+    private Float score;
 
-    @Lob
-    private String comments; // JSON 문자열로 저장
+    // AI가 생성한 피드백 텍스트
+    @Column(length = 2000)
+    private String feedbackText;
 
+    // 피드백 생성 시작
     private LocalDateTime generatedAt = LocalDateTime.now();
 }

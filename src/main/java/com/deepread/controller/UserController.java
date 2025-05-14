@@ -2,6 +2,7 @@ package com.deepread.controller;
 
 import com.deepread.dto.UpdateLevelDto;
 import com.deepread.entity.User;
+import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,7 +23,7 @@ public class UserController {
     @GetMapping("/profile")
     public User getUserProfile(@AuthenticationPrincipal User authenticatedUser) {
         return userService.getUserProfile(authenticatedUser.getId())
-                .orElseThrow(() -> new RuntimeException("User not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
     // 사용자의 문해력 레벨(level) 수정

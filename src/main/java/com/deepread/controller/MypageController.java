@@ -1,6 +1,7 @@
 package com.deepread.controller;
 
 import com.deepread.entity.UserReport;
+import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.service.MypageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,7 +30,11 @@ public class MypageController {
     @ApiResponse(responseCode = "200", description = "리포트 반환")
     @GetMapping("/report/{userId}")
     public List<UserReport> getUserReport(@PathVariable Long userId) {
-        return mypageService.getUserReport(userId);
+        List<UserReport> reports = mypageService.getUserReport(userId);
+        if (reports.isEmpty()) {
+            throw new ResourceNotFoundException("리포트를 찾을 수 없습니다.");
+        }
+        return reports;
     }
 
     @Operation(summary = "회원 탈퇴", description = "사용자의 계정을 삭제한다.")

@@ -26,7 +26,7 @@ public class UserService {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            user.setUser_level(newLevel);
+            user.setLevel(newLevel);
             user.setUpdatedAt(java.time.LocalDateTime.now());
             userRepository.save(user);
             return true;

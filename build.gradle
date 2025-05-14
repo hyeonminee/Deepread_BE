@@ -46,6 +46,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	// Spring Security 테스트용
+	testImplementation 'org.springframework.security:spring-security-test'
+
 	// 기타
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
