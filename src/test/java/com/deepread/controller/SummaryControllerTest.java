@@ -1,6 +1,5 @@
 package com.deepread.controller;
 
-import com.deepread.dto.SummaryDto;
 import com.deepread.entity.Content;
 import com.deepread.entity.Summary;
 import com.deepread.entity.SummaryFeedback;

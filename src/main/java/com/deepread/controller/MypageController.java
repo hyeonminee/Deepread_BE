@@ -1,14 +1,14 @@
 package com.deepread.controller;
 
-import com.deepread.entity.UserReport;
-import com.deepread.exception.ResourceNotFoundException;
+import com.deepread.dto.response.MypageStatisticsDto;
+import com.deepread.dto.response.UserCalendarDto;
 import com.deepread.service.MypageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+        import java.util.List;
 
 @RestController
 @RequestMapping("/api/mypage")
@@ -17,30 +17,18 @@ public class MypageController {
 
     private final MypageService mypageService;
 
-    @Operation(summary = "캘린더 조회", description = "사용자의 월별 학습 일자를 조회한다.")
-    @ApiResponse(responseCode = "200", description = "캘린더 정보 반환")
-    @GetMapping("/calendar/{userId}")
-    public List<String> getUserCalendar(@PathVariable Long userId) {
-        return mypageService.getUserCalendar(userId).stream()
-                .map(calendar -> calendar.getUser_date().toString())
-                .toList();
+    @Operation(summary = "주별 접속일 수 및 일별 콘텐츠", description = "사용자의 주별 접속일 수와 일별 조회 콘텐츠를 조회한다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/calendar/statistics/{userId}")
+    public List<UserCalendarDto> getWeeklyCalendarStats(@PathVariable Long userId) {
+        return mypageService.getWeeklyCalendarStatistics(userId);
     }
 
-    @Operation(summary = "리포트 조회", description = "사용자의 월별 학습 리포트를 조회한다.")
-    @ApiResponse(responseCode = "200", description = "리포트 반환")
-    @GetMapping("/report/{userId}")
-    public List<UserReport> getUserReport(@PathVariable Long userId) {
-        List<UserReport> reports = mypageService.getUserReport(userId);
-        if (reports.isEmpty()) {
-            throw new ResourceNotFoundException("리포트를 찾을 수 없습니다.");
-        }
-        return reports;
+    @Operation(summary = "사용자별 요약/퀴즈 통계", description = "요약 피드백 평균 점수와 퀴즈 정확도를 반환한다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/statistics/{userId}")
+    public MypageStatisticsDto getUserStatistics(@PathVariable Long userId) {
+        return mypageService.getUserStatistics(userId);
     }
 
-    @Operation(summary = "회원 탈퇴", description = "사용자의 계정을 삭제한다.")
-    @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공 여부 반환")
-    @DeleteMapping("/withdraw/{userId}")
-    public boolean withdrawUser(@PathVariable Long userId) {
-        return mypageService.withdrawUser(userId);
-    }
 }

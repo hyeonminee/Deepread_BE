@@ -1,10 +1,19 @@
 package com.deepread.service;
 
+import com.deepread.dto.request.SummaryRequestDto;
+import com.deepread.dto.response.SummaryFeedbackResponseDto;
+import com.deepread.dto.response.SummaryResponseDto;
+import com.deepread.entity.Content;
 import com.deepread.entity.Summary;
 import com.deepread.entity.SummaryFeedback;
+import com.deepread.entity.User;
+import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.repository.SummaryFeedbackRepository;
 import com.deepread.repository.SummaryRepository;
+import com.deepread.repository.UserRepository;
+import com.deepread.repository.ContentRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,28 +24,40 @@ public class SummaryService {
 
     private final SummaryRepository summaryRepository;
     private final SummaryFeedbackRepository summaryFeedbackRepository;
+    private final UserRepository userRepository;
+    private final ContentRepository contentRepository;
+    private final ModelMapper modelMapper;
 
-    /**
-     * 요약 저장 + AI 피드백 생성 및 저장까지 수행
-     */
-    public Summary submitSummary(Summary summary) {
-        // 1. 요약 저장
+    public SummaryResponseDto submitSummary(SummaryRequestDto dto) {
+        // 사용자, 콘텐츠 조회
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
+        Content content = contentRepository.findById(dto.getContentId())
+                .orElseThrow(() -> new ResourceNotFoundException("콘텐츠를 찾을 수 없습니다."));
+
+        // Summary Entity 생성
+        Summary summary = new Summary();
+        summary.setUser(user);
+        summary.setContent(content);
+        summary.setUserSummary(dto.getUserSummary());
+
+        // Summary 저장
         Summary saved = summaryRepository.save(summary);
 
-        // 2. AI 피드백 생성
+        // AI 피드백 생성 및 저장
         SummaryFeedback feedback = generateFeedback(saved);
-
-        // 3. 피드백 저장
         summaryFeedbackRepository.save(feedback);
 
-        return saved;
+        // DTO 응답 생성
+        SummaryResponseDto responseDto = new SummaryResponseDto();
+        responseDto.setSummaryId(saved.getId());
+        responseDto.setUserSummary(saved.getUserSummary());
+        responseDto.setFeedback(modelMapper.map(feedback, SummaryFeedbackResponseDto.class));
+
+        return responseDto;
     }
 
-    /**
-     * 요약 기반 AI 피드백 생성 로직 (임시로 정적 텍스트 사용)
-     */
     private SummaryFeedback generateFeedback(Summary summary) {
-        // TODO: 실제 GPT 연동 또는 평가 알고리즘 삽입
         SummaryFeedback feedback = new SummaryFeedback();
         feedback.setSummary(summary);
         feedback.setScore(92.5f);
@@ -53,45 +74,3 @@ public class SummaryService {
                 .flatMap(summaryFeedbackRepository::findBySummary);
     }
 }
-
-
-//package com.deepread.service;
-//
-//import com.deepread.entity.Summary;
-//import com.deepread.entity.SummaryFeedback;
-//import com.deepread.repository.SummaryFeedbackRepository;
-//import com.deepread.repository.SummaryRepository;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.Optional;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class SummaryService {
-//
-//    private final SummaryRepository summaryRepository;
-//    private final SummaryFeedbackRepository summaryFeedbackRepository;
-//
-//    // 사용자의 요약 저장
-//    public Summary submitSummary(Summary summary) {
-//        return summaryRepository.save(summary);
-//    }
-//
-//    // 요약에 대한 AI 피드백 저장
-//    public SummaryFeedback getFeedback(SummaryFeedback feedback) {
-//        return summaryFeedbackRepository.save(feedback);
-//    }
-//
-//    // 요약 및 피드백 조회 (선택 기능)
-//    public Optional<Summary> getSummaryById(Long id) {
-//        return summaryRepository.findById(id);
-//    }
-//
-//    // summaryId로 Summary를 조회한 뒤, 해당 요약에 대한 피드백을 반환
-//    public Optional<SummaryFeedback> getFeedbackBySummaryId(Long summaryId) {
-//        return summaryRepository.findById(summaryId)
-//                .flatMap(summaryFeedbackRepository::findBySummary);
-//    }
-//
-//}

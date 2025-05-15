@@ -1,10 +1,12 @@
-package com.deepread.dto;
+package com.deepread.dto.request;
 
-import lombok.Data;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class SummaryDto {
+@Getter
+@Setter
+public class SummaryRequestDto {
     @NotNull
     private Long userId;
 
