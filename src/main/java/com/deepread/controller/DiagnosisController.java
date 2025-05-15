@@ -5,6 +5,7 @@ import com.deepread.dto.response.DiagnosisResultResponseDto;
 import com.deepread.service.DiagnosisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class DiagnosisController {
     @Operation(summary = "진단 결과 저장", description = "사용자의 진단 결과를 저장한다.")
     @ApiResponse(responseCode = "200", description = "진단 결과 저장 완료")
     @PostMapping
-    public ResponseEntity<DiagnosisResultResponseDto> submitDiagnosis(@RequestBody DiagnosisResultRequestDto dto) {
+    public ResponseEntity<DiagnosisResultResponseDto> submitDiagnosis(@RequestBody @Valid DiagnosisResultRequestDto dto) {
         DiagnosisResultResponseDto responseDto = diagnosisService.submitDiagnosisResult(dto);
         return ResponseEntity.ok(responseDto);
     }

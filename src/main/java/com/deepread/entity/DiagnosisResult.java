@@ -24,7 +24,7 @@ public class DiagnosisResult {
     private Integer score;
 
     @Enumerated(EnumType.STRING)
-    private User.Level user_level;
+    private User.Level userLevel;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -1,7 +1,7 @@
 package com.deepread.controller;
 
-import com.deepread.entity.DiagnosisResult;
-import com.deepread.entity.User;
+import com.deepread.dto.request.DiagnosisResultRequestDto;
+import com.deepread.dto.response.DiagnosisResultResponseDto;
 import com.deepread.service.DiagnosisService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -33,32 +33,43 @@ class DiagnosisControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser // 인증된 사용자로 설정 (기본값: username="user")
+    @WithMockUser
     @DisplayName("진단 결과 저장 성공")
     void submitDiagnosis_success() throws Exception {
-        DiagnosisResult result = new DiagnosisResult();
-        User user = new User();
-        user.setId(1L);
-        result.setUser(user);
+        // given
+        DiagnosisResultRequestDto requestDto = new DiagnosisResultRequestDto();
+        requestDto.setUserId(1L);
+        requestDto.setScore(75);
+        requestDto.setUserLevel(com.deepread.entity.User.Level.중급);
 
-        Mockito.when(diagnosisService.submitDiagnosisResult(any(DiagnosisResult.class)))
-                .thenReturn(result);
+        DiagnosisResultResponseDto responseDto = new DiagnosisResultResponseDto();
+        responseDto.setUserId(1L);
+        responseDto.setScore(75);
+        responseDto.setUserLevel(com.deepread.entity.User.Level.중급);
 
+        // when
+        Mockito.when(diagnosisService.submitDiagnosisResult(any(DiagnosisResultRequestDto.class)))
+                .thenReturn(responseDto);
+
+        // then
         mockMvc.perform(post("/api/diagnosis")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(result)))
-                .andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1L))
+                .andExpect(jsonPath("$.score").value(75))
+                .andExpect(jsonPath("$.userLevel").value("중급"));
     }
 
     @Test
-    @DisplayName("유효하지 않은 진단 결과 예외 발생")
+    @WithMockUser
+    @DisplayName("진단 결과 저장 실패 - 누락된 사용자 ID")
     void submitDiagnosis_invalidRequest() throws Exception {
-        DiagnosisResult invalid = new DiagnosisResult(); // user == null
+        DiagnosisResultRequestDto invalidDto = new DiagnosisResultRequestDto();
 
         mockMvc.perform(post("/api/diagnosis")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalid)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("진단 결과 또는 사용자 정보가 유효하지 않습니다."));
+                        .content(objectMapper.writeValueAsString(invalidDto)))
+                .andExpect(status().isBadRequest());
     }
 }

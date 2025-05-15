@@ -23,13 +23,13 @@ public class DiagnosisService {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("사용자 정보를 찾을 수 없습니다."));
 
-        DiagnosisResult result = modelMapper.map(dto, DiagnosisResult.class);
-        result.setUser(user); // 연결 수동 지정
+        DiagnosisResult result = new DiagnosisResult();
+        result.setUser(user);
+        result.setScore(dto.getScore());
+        result.setUserLevel(dto.getUserLevel());
 
         DiagnosisResult saved = diagnosisResultRepository.save(result);
 
-        DiagnosisResultResponseDto responseDto = modelMapper.map(saved, DiagnosisResultResponseDto.class);
-        responseDto.setUserId(user.getId());
-        return responseDto;
+        return modelMapper.map(saved, DiagnosisResultResponseDto.class);
     }
 }

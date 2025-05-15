@@ -1,7 +1,7 @@
 package com.deepread.controller;
 
-import com.deepread.entity.QuizResult;
-import com.deepread.entity.User;
+import com.deepread.dto.request.QuizResultRequestDto;
+import com.deepread.dto.response.QuizResultResponseDto;
 import com.deepread.service.QuizService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -34,27 +34,41 @@ class QuizControllerTest {
     @Test
     @DisplayName("퀴즈 결과 저장 성공")
     void saveQuizResult_success() throws Exception {
-        QuizResult result = new QuizResult();
-        result.setUser(new User());
+        // given
+        QuizResultRequestDto requestDto = new QuizResultRequestDto();
+        requestDto.setUserId(1L);
+        requestDto.setTotalQuestions(5);
+        requestDto.setCorrectCount(3);
+        requestDto.setAccuracy(60.0f);
 
-        Mockito.when(quizService.saveQuizResult(any(QuizResult.class)))
-                .thenReturn(result);
+        QuizResultResponseDto responseDto = new QuizResultResponseDto();
+        responseDto.setUserId(1L);
+        responseDto.setTotalQuestions(5);
+        responseDto.setCorrectCount(3);
+        responseDto.setAccuracy(60.0f);
 
+        // when
+        Mockito.when(quizService.saveQuizResult(any(QuizResultRequestDto.class))).thenReturn(responseDto);
+
+        // then
         mockMvc.perform(post("/api/quiz/result")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(result)))
-                .andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1L))
+                .andExpect(jsonPath("$.totalQuestions").value(5))
+                .andExpect(jsonPath("$.correctCount").value(3))
+                .andExpect(jsonPath("$.accuracy").value(60.0));
     }
 
     @Test
-    @DisplayName("잘못된 퀴즈 결과 예외 처리")
-    void saveQuizResult_invalid() throws Exception {
-        QuizResult invalid = new QuizResult(); // user == null
+    @DisplayName("퀴즈 결과 저장 실패 - 누락된 사용자 ID")
+    void saveQuizResult_invalidRequest() throws Exception {
+        QuizResultRequestDto invalidDto = new QuizResultRequestDto();
 
         mockMvc.perform(post("/api/quiz/result")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalid)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("퀴즈 결과 또는 사용자 정보가 유효하지 않습니다."));
+                        .content(objectMapper.writeValueAsString(invalidDto)))
+                .andExpect(status().isBadRequest());
     }
 }

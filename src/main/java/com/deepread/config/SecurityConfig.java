@@ -28,6 +28,7 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // ✅ 퍼블릭 접근 허용 경로
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/oauth2/**",
@@ -35,6 +36,14 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**").permitAll()
+
+                        // USER 전용 API
+                        .requestMatchers("/api/user/**").hasRole("USER")
+
+                        // ADMIN 전용 API (필요 시)
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // 나머지는 인증만 필요
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth -> oauth
@@ -43,7 +52,7 @@ public class SecurityConfig {
                         )
                         .successHandler(oAuth2SuccessHandler)
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository), UsernamePasswordAuthenticationFilter.class) // 필터 등록
-                .build();  // 체이닝의 끝은 build()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository), UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 }

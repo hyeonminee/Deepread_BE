@@ -23,21 +23,18 @@ public class UserController {
     @Operation(summary = "프로필 조회", description = "현재 로그인한 사용자의 프로필 정보를 조회한다.")
     @ApiResponse(responseCode = "200", description = "프로필 반환")
     @GetMapping("/profile")
-    public UserResponseDto getUserProfile(@AuthenticationPrincipal User authenticatedUser) {
-        User user = userService.getUserProfile(authenticatedUser.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
-
-        return modelMapper.map(user, UserResponseDto.class);
+    public UserResponseDto getUserProfile(@AuthenticationPrincipal User user) {
+        return modelMapper.map(userService.getUserProfile(user.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다.")),
+                UserResponseDto.class);
     }
 
     @Operation(summary = "레벨 수정", description = "현재 사용자의 문해력 수준(Level)을 수정한다.")
     @ApiResponse(responseCode = "200", description = "레벨 수정 성공 메시지 반환")
     @PutMapping("/level")
-    public String updateUserLevel(
-            @AuthenticationPrincipal User authenticatedUser,
-            @RequestBody UpdateLevelRequestDto dto) {
-
-        boolean updated = userService.updateLevel(authenticatedUser.getId(), dto.getNewLevel());
+    public String updateUserLevel(@AuthenticationPrincipal User user,
+                                  @RequestBody UpdateLevelRequestDto dto) {
+        boolean updated = userService.updateLevel(user.getId(), dto.getNewLevel());
         return updated ? "User level updated successfully" : "User not found";
     }
 

@@ -2,12 +2,14 @@ package com.deepread.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -41,6 +43,10 @@ public class User implements UserDetails {
 
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    // 사용자 역할 (권한)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+
     public enum SocialProvider {
         kakao, naver, google
     }
@@ -49,31 +55,43 @@ public class User implements UserDetails {
         초급, 중급, 고급
     }
 
-    // UserDetails 구현 필수 메서드
+    public enum Role {
+        USER, ADMIN
+    }
+
+    // Spring Security 권한 반환
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList(); // 권한이 필요 없으면 빈 리스트
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
     public String getUsername() {
-        return this.socialId; // 로그인 식별자 (socialId)
+        return this.socialId;
     }
 
     @Override
     public String getPassword() {
-        return null; // 비밀번호 없음 (소셜 로그인)
+        return null; // 소셜 로그인이라서 패스워드 없음
     }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isEnabled() { return !this.isDeleted; }
+    public boolean isEnabled() {
+        return !Boolean.TRUE.equals(this.isDeleted);
+    }
 }

@@ -1,11 +1,12 @@
 package com.deepread.dto.response;
 
 import com.deepread.entity.User;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
-@Builder
+@Setter
+@NoArgsConstructor  // 기본 생성자 추가
+@AllArgsConstructor // 모든 필드 포함한 생성자 추가
 public class UserResponseDto {
     private Long id;
     private String name;

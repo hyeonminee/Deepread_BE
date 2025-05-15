@@ -1,5 +1,6 @@
 package com.deepread.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,12 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ChatbotLogRequestDto {
-    @NotNull
+
+    @NotNull(message = "userId는 필수입니다.")
     private Long userId;
 
-    @NotNull
+    @NotBlank(message = "질문은 비어 있을 수 없습니다.")
     private String question;
 
-    @NotNull
+    @NotBlank(message = "응답은 비어 있을 수 없습니다.")
     private String response;
 }

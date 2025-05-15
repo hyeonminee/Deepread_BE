@@ -3,6 +3,7 @@ package com.deepread.controller;
 import com.deepread.entity.Content;
 import com.deepread.entity.User;
 import com.deepread.service.ContentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -30,6 +31,9 @@ class ContentControllerTest {
     @MockBean
     private ContentService contentService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     @WithMockUser
     @DisplayName("레벨에 따라 콘텐츠 추천 성공")
@@ -47,7 +51,6 @@ class ContentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("초급 콘텐츠 1"));
     }
-
 
     @Test
     @WithMockUser
@@ -72,7 +75,6 @@ class ContentControllerTest {
 
         mockMvc.perform(get("/api/contents/999"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("콘텐츠를 찾을 수 없습니다."));
+                .andExpect(jsonPath("$.message").value("콘텐츠를 찾을 수 없습니다."));
     }
-
 }

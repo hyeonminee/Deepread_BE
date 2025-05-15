@@ -52,6 +52,9 @@ dependencies {
 
 	// 기타
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+	// 테스트 시에도 검증 작동하게 하려면
+	testImplementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 }
 
 tasks.named('test') {
