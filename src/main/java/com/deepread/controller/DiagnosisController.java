@@ -5,6 +5,7 @@ import com.deepread.dto.response.DiagnosisResultResponseDto;
 import com.deepread.service.DiagnosisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,11 @@ public class DiagnosisController {
     private final DiagnosisService diagnosisService;
 
     @Operation(summary = "진단 결과 저장", description = "사용자의 진단 결과를 저장한다.")
-    @ApiResponse(responseCode = "200", description = "진단 결과 저장 완료")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "진단 결과 저장 성공"),
+            @ApiResponse(responseCode = "400", description = "요청 데이터 오류 (유효성 검증 실패 등)"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
     @PostMapping
     public ResponseEntity<DiagnosisResultResponseDto> submitDiagnosis(@RequestBody @Valid DiagnosisResultRequestDto dto) {
         DiagnosisResultResponseDto responseDto = diagnosisService.submitDiagnosisResult(dto);
