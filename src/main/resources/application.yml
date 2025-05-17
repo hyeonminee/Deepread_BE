@@ -2,13 +2,29 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: deepread-backend
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/deepread?serverTimezone=Asia/Seoul
+    username: root
+    password: REMOVED
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
   security:
     oauth2:
       client:
-        registration: # registration: OAuth 로그인 제공자 등록 (카카오, 네이버, 구글)
+        registration:
           kakao:
             client-id: REMOVED
-            client-authentication-method: POST
+            client-authentication-method: post
             authorization-grant-type: authorization_code
             redirect-uri: http://localhost:8080/api/auth/kakao/callback
             scope:
@@ -38,7 +54,7 @@ spring:
               - email
             client-name: Google
 
-        provider: # 각 제공자의 인증/토큰/유저 정보 엔드포인트
+        provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
             token-uri: https://kauth.kakao.com/oauth/token
@@ -53,7 +69,5 @@ spring:
 
 jwt:
   secret: REMOVED
-  access-token-expiration: 360000 # 1시간(ms)
-  refresh-token-expiration: 1209600000 # 14일
-
-# JWT, 포트, 로깅 등은 추후에 아래에 추가할 예정
+  access-token-expiration: 360000     # 6분
+  refresh-token-expiration: 1209600000  # 14일

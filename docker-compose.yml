@@ -1,0 +1,40 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    container_name: deepread-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: REMOVED
+      MYSQL_DATABASE: deepread
+      MYSQL_USER: user
+      MYSQL_PASSWORD: REMOVED
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: deepread-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/deepread
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: REMOVED
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: REMOVED
+      JWT_ACCESS_TOKEN_EXPIRATION: 360000
+      JWT_REFRESH_TOKEN_EXPIRATION: 1209600000
+
+volumes:
+  mysql-data:
