@@ -47,8 +47,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         );
         SecurityContextHolder.getContext().setAuthentication(userAuth);
 
-        // 응답 헤더 또는 쿠키로 전달 (클라이언트에 JWT 응답)
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"accessToken\": \"" + accessToken + "\", \"refreshToken\": \"" + refreshToken + "\"}");
+        // 모바일 앱으로 리디렉션
+        String redirectUrl = "myapp://oauth2/redirect"
+                + "?accessToken=" + accessToken
+                + "&refreshToken=" + refreshToken;
+
+        response.sendRedirect(redirectUrl);
     }
 }
