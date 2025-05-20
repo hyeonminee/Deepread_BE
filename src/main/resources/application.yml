@@ -26,7 +26,7 @@ spring:
             client-id: REMOVED
             client-authentication-method: post
             authorization-grant-type: authorization_code
-            redirect-uri: "http://43.201.65.49:8080/login/oauth2/code/kakao"
+            redirect-uri: "http://13.125.253.218:8080/login/oauth2/code/kakao"
 
             scope:
               - profile_nickname
@@ -38,7 +38,7 @@ spring:
             client-id: REMOVED
             client-secret: REMOVED
             authorization-grant-type: authorization_code
-            redirect-uri: "http://43.201.65.49:8080/login/oauth2/code/naver"
+            redirect-uri: "http://13.125.253.218:8080/login/oauth2/code/naver"
             scope:
               - name
               - email
@@ -49,7 +49,7 @@ spring:
             client-id: REMOVED
             client-secret: REMOVED
             authorization-grant-type: authorization_code
-            redirect-uri: "http://ec2-43-201-65-49.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google"
+            redirect-uri: "http://ec2-13-125-253-218.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google"
             scope:
               - profile
               - email
