@@ -26,7 +26,7 @@ spring:
             client-id: REMOVED
             client-authentication-method: post
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/api/auth/kakao/callback"
+            redirect-uri: "http://43.201.66.107:8080/login/oauth2/code/kakao"
 
             scope:
               - profile_nickname
@@ -38,7 +38,7 @@ spring:
             client-id: REMOVED
             client-secret: REMOVED
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/api/auth/naver/callback"
+            redirect-uri: "http://43.201.66.107:8080/login/oauth2/code/naver"
             scope:
               - name
               - email
@@ -49,7 +49,8 @@ spring:
             client-id: REMOVED
             client-secret: REMOVED
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/api/auth/google/callback"
+            redirect-uri: "http://ec2-43-201-66-107.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google
+"
             scope:
               - profile
               - email
