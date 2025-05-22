@@ -26,7 +26,7 @@ spring:
             client-id: REMOVED
             client-authentication-method: post
             authorization-grant-type: authorization_code
-            redirect-uri: "http://43.201.66.107:8080/login/oauth2/code/kakao"
+            redirect-uri: "http://3.39.11.221:8080/login/oauth2/code/kakao"
 
             scope:
               - profile_nickname
@@ -38,7 +38,7 @@ spring:
             client-id: REMOVED
             client-secret: REMOVED
             authorization-grant-type: authorization_code
-            redirect-uri: "http://43.201.66.107:8080/login/oauth2/code/naver"
+            redirect-uri: "http://3.39.11.221:8080/login/oauth2/code/naver"
             scope:
               - name
               - email
@@ -49,8 +49,7 @@ spring:
             client-id: REMOVED
             client-secret: REMOVED
             authorization-grant-type: authorization_code
-            redirect-uri: "http://ec2-43-201-66-107.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google
-"
+            redirect-uri: "http://ec2-3-39-11-221.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google"
             scope:
               - profile
               - email
@@ -73,3 +72,11 @@ jwt:
   secret: REMOVED
   access-token-expiration: 360000     # 6분
   refresh-token-expiration: 1209600000  # 14일
+
+custom:
+  redirect:
+    app: myapp://oauth2/redirect
+    web: http://3.39.11.221:8080/login/ # 브라우저 테스트용(Spring Security 기본 로그인 경로로 돌아감)
+    # 프론트엔드에서 만든 로그인 페이지로 추후 수정해야함
+#    redirect-uri 자체는 backend에서 frontend로 보내주고,
+#    프론트에서 로그인 페이지로 유도하는 것이 더 일반적
