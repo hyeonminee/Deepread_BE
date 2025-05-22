@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -95,3 +94,4 @@ public class User implements UserDetails {
         return !Boolean.TRUE.equals(this.isDeleted);
     }
 }
+>>>>>>> 5544aefb8273249396e3ead3b63041e0cb15dccf
