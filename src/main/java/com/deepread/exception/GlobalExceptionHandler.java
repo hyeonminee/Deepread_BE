@@ -1,71 +1,47 @@
 package com.deepread.exception;
 
+import com.deepread.dto.response.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. 유효성 검사 실패 시 처리
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex, WebRequest request) {
-        Map<String, String> validationErrors = new HashMap<>();
-        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                "timestamp", LocalDateTime.now(),
-                "error", "Bad Request",
-                "message", "Validation failed",
-                "validationErrors", validationErrors,
-                "path", request.getDescription(false).replace("uri=", "")
-        ));
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e, HttpServletRequest request) {
+        return buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST, request.getRequestURI());
     }
 
-    // 2. 리소스 없음 예외 처리
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ErrorResponse> handleIOException(IOException e, HttpServletRequest request) {
+        return buildErrorResponse("API 요청 중 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI());
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                "timestamp", LocalDateTime.now(),
-                "error", "Not Found",
-                "message", ex.getMessage(),
-                "path", request.getDescription(false).replace("uri=", "")
-        ));
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException e, HttpServletRequest request) {
+        return buildErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
     }
 
-    // 3. 권한 없음 예외 처리
-    @ExceptionHandler(UnauthorizedAccessException.class)
-    public ResponseEntity<?> handleUnauthorized(UnauthorizedAccessException ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                "timestamp", LocalDateTime.now(),
-                "error", "Unauthorized",
-                "message", ex.getMessage(),
-                "path", request.getDescription(false).replace("uri=", "")
-        ));
-    }
-
-    // 4. 기타 예외 처리
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGlobalException(Exception ex, WebRequest request) {
-        log.error("Unhandled exception occurred", ex);
+    public ResponseEntity<ErrorResponse> handleOther(Exception e, HttpServletRequest request) {
+        log.error("Unhandled exception occurred", e);
+        return buildErrorResponse("서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI());
+    }
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "timestamp", LocalDateTime.now(),
-                "error", "Internal Server Error",
-                "message", ex.getMessage(),
-                "path", request.getDescription(false).replace("uri=", "")
-        ));
+    private ResponseEntity<ErrorResponse> buildErrorResponse(String message, HttpStatus status, String path) {
+        return ResponseEntity.status(status).body(ErrorResponse.builder()
+                .error(status.getReasonPhrase())
+                .message(message)
+                .status(status.value())
+                .path(path)
+                .timestamp(LocalDateTime.now())
+                .build());
     }
 }

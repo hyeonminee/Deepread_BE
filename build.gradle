@@ -45,7 +45,7 @@ dependencies {
 	implementation 'javax.xml.bind:jaxb-api:2.3.0'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-	implementation 'com.google.code.gson:gson:2.8.7'
+	implementation 'com.google.code.gson:gson:2.8.9'
 	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 	implementation 'com.auth0:java-jwt:4.4.0'
 
@@ -59,6 +59,8 @@ dependencies {
 	// 기타
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+	implementation 'org.json:json:20231013'
+
 	// 테스트 시에도 검증 작동하게 하려면
 	testImplementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 }

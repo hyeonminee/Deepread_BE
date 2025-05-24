@@ -94,4 +94,3 @@ public class User implements UserDetails {
         return !Boolean.TRUE.equals(this.isDeleted);
     }
 }
->>>>>>> 5544aefb8273249396e3ead3b63041e0cb15dccf
