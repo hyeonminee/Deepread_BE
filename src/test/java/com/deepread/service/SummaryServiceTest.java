@@ -17,9 +17,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class SummaryServiceTest {
@@ -28,6 +30,7 @@ class SummaryServiceTest {
     private SummaryFeedbackRepository summaryFeedbackRepository;
     private UserRepository userRepository;
     private ContentRepository contentRepository;
+    private SummaryEvaluationService summaryEvaluationService;
     private SummaryService summaryService;
 
     @BeforeEach
@@ -36,17 +39,19 @@ class SummaryServiceTest {
         summaryFeedbackRepository = mock(SummaryFeedbackRepository.class);
         userRepository = mock(UserRepository.class);
         contentRepository = mock(ContentRepository.class);
+        summaryEvaluationService = mock(SummaryEvaluationService.class);
         summaryService = new SummaryService(
                 summaryRepository,
                 summaryFeedbackRepository,
                 userRepository,
                 contentRepository,
-                new ModelMapper()
+                new ModelMapper(),
+                summaryEvaluationService
         );
     }
 
     @Test
-    @DisplayName("요약 제출 및 피드백 생성 성공")
+    @DisplayName("요약 제출 및 AI 피드백 생성 성공")
     void submitSummary_success() {
         // given
         Long userId = 1L;
@@ -63,6 +68,7 @@ class SummaryServiceTest {
 
         Content content = new Content();
         content.setId(contentId);
+        content.setContent("원문 텍스트입니다.");
 
         Summary savedSummary = new Summary();
         savedSummary.setId(10L);
@@ -70,15 +76,16 @@ class SummaryServiceTest {
         savedSummary.setContent(content);
         savedSummary.setUserSummary(userSummary);
 
-        SummaryFeedback feedback = new SummaryFeedback();
-        feedback.setSummary(savedSummary);
-        feedback.setScore(92.5f);
-        feedback.setFeedbackText("좋은 요약입니다.");
+        Map<String, Object> aiResult = Map.of(
+                "entailment_score", 92.5f,
+                "feedback", "핵심이 잘 드러난 요약입니다. 불필요한 반복이 없고 구조가 명확합니다."
+        );
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(contentRepository.findById(contentId)).thenReturn(Optional.of(content));
         when(summaryRepository.save(any(Summary.class))).thenReturn(savedSummary);
-        when(summaryFeedbackRepository.save(any(SummaryFeedback.class))).thenReturn(feedback);
+        when(summaryFeedbackRepository.save(any(SummaryFeedback.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(summaryEvaluationService.evaluateSummary(anyString(), anyString())).thenReturn(aiResult);
 
         // when
         SummaryResponseDto responseDto = summaryService.submitSummary(dto);
@@ -102,9 +109,7 @@ class SummaryServiceTest {
 
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> {
-            summaryService.submitSummary(dto);
-        });
+        assertThrows(ResourceNotFoundException.class, () -> summaryService.submitSummary(dto));
     }
 
     @Test
@@ -118,9 +123,7 @@ class SummaryServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
         when(contentRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> {
-            summaryService.submitSummary(dto);
-        });
+        assertThrows(ResourceNotFoundException.class, () -> summaryService.submitSummary(dto));
     }
 
     @Test

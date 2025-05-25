@@ -81,3 +81,7 @@ custom:
 app:
   frontend-redirect-uri: https://auth.expo.io/@sbk03/adult-literacy-app
   base-url: http://13.209.77.190:8080
+
+flask:
+  api:
+    url: http://localhost:5000  # EC2 배포 시 Public IP로 변경

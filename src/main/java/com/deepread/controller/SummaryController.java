@@ -29,6 +29,7 @@ public class SummaryController {
     @PostMapping
     public ResponseEntity<SummaryResponseDto> submitSummary(@RequestBody SummaryRequestDto dto) {
         SummaryResponseDto responseDto = summaryService.submitSummary(dto);
+
         return ResponseEntity.ok(responseDto);
     }
 
