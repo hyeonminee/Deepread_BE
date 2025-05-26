@@ -35,6 +35,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI());
     }
 
+    @ExceptionHandler(FlaskApiException.class)
+    public ResponseEntity<ErrorResponse> handleFlaskApiError(FlaskApiException e, HttpServletRequest request) {
+        return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI());
+    }
+
+
     private ResponseEntity<ErrorResponse> buildErrorResponse(String message, HttpStatus status, String path) {
         return ResponseEntity.status(status).body(ErrorResponse.builder()
                 .error(status.getReasonPhrase())

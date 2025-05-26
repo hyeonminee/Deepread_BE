@@ -20,9 +20,12 @@ public class Content {
     private String title;
 
     @Lob
-    private String content;
+    private String content; // 원문 텍스트
 
-    @Enumerated(EnumType.STRING) // enum 이름을 DB에 저장
+    @Lob
+    private String aiSummary; // AI 기준 요약문
+
+    @Enumerated(EnumType.STRING)
     private User.Level level;
 
     private LocalDateTime createdAt = LocalDateTime.now();
