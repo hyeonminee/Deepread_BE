@@ -60,6 +60,7 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 	implementation 'org.json:json:20231013'
+	implementation 'com.opencsv:opencsv:5.7.1'
 
 	// 테스트 시에도 검증 작동하게 하려면
 	testImplementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
