@@ -85,7 +85,8 @@ class SummaryServiceTest {
         when(contentRepository.findById(contentId)).thenReturn(Optional.of(content));
         when(summaryRepository.save(any(Summary.class))).thenReturn(savedSummary);
         when(summaryFeedbackRepository.save(any(SummaryFeedback.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(summaryEvaluationService.evaluateSummary(anyString(), anyString())).thenReturn(aiResult);
+        when(summaryEvaluationService.evaluateSummary(anyString(), anyString(), anyString())).thenReturn(aiResult);
+
 
         // when
         SummaryResponseDto responseDto = summaryService.submitSummary(dto);
