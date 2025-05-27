@@ -8,12 +8,17 @@ import com.deepread.entity.User;
 import com.deepread.oauth.jwt.JwtUtil;
 import com.deepread.repository.UserRepository;
 import com.deepread.service.RefreshTokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Tag(name = "소셜 로그인", description = "OAuth 기반 로그인 처리")
 @RestController
 @RequestMapping("/oauth/callback")
 @RequiredArgsConstructor
@@ -23,6 +28,11 @@ public class OAuthLoginController {
     private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
 
+    @Operation(summary = "카카오 로그인", description = "카카오 사용자 정보를 통해 로그인 처리")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping("/kakao")
     public ResponseEntity<?> kakaoLogin(@RequestBody KakaoLoginRequestDto dto) {
         Map<String, Object> kakaoProfile = dto.getKakaoProfileResult();
@@ -35,6 +45,11 @@ public class OAuthLoginController {
         return processUserLogin(kakaoId, User.SocialProvider.kakao, nickname, email, profileImage);
     }
 
+    @Operation(summary = "구글 로그인", description = "구글 사용자 정보를 통해 로그인 처리")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequestDto dto) {
         Map<String, Object> profile = dto.getGoogleProfileResult();
@@ -46,6 +61,11 @@ public class OAuthLoginController {
         return processUserLogin(googleId, User.SocialProvider.google, name, email, picture);
     }
 
+    @Operation(summary = "네이버 로그인", description = "네이버 사용자 정보를 통해 로그인 처리")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping("/naver")
     public ResponseEntity<?> naverLogin(@RequestBody NaverLoginRequestDto dto) {
         Map<String, Object> profile = dto.getNaverProfileResult();

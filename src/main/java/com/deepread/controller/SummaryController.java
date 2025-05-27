@@ -9,6 +9,7 @@ import com.deepread.service.SummaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/summaries")
 @RequiredArgsConstructor
+@Tag(name = "Summary", description = "요약 기능 관련 API")
 public class SummaryController {
 
     private final SummaryService summaryService;
@@ -29,7 +31,6 @@ public class SummaryController {
     @PostMapping
     public ResponseEntity<SummaryResponseDto> submitSummary(@RequestBody SummaryRequestDto dto) {
         SummaryResponseDto responseDto = summaryService.submitSummary(dto);
-
         return ResponseEntity.ok(responseDto);
     }
 

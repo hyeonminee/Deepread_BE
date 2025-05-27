@@ -27,7 +27,7 @@ spring:
             client-id: REMOVED
             client-authentication-method: post
             authorization-grant-type: authorization_code
-            redirect-uri: "Ignored" # 무시됨. 프론트에서 access token 직접 전달
+            redirect-uri: "Ignored"
             scope:
               - profile_nickname
               - account_email
@@ -38,7 +38,7 @@ spring:
             client-id: REMOVED
             client-secret: REMOVED
             authorization-grant-type: authorization_code
-            redirect-uri: "Ignored" # 무시됨. 프론트에서 access token 직접 전달
+            redirect-uri: "Ignored"
             scope:
               - name
               - email
@@ -49,7 +49,7 @@ spring:
             client-id: REMOVED
             client-secret: REMOVED
             authorization-grant-type: authorization_code
-            redirect-uri: "Ignored" # 무시됨. 프론트에서 access token 직접 전달
+            redirect-uri: "Ignored"
             scope:
               - profile
               - email
@@ -70,13 +70,13 @@ spring:
 
 jwt:
   secret: REMOVED
-  access-token-expiration: 360000     # 6분
-  refresh-token-expiration: 1209600000  # 14일
+  access-token-expiration: 360000
+  refresh-token-expiration: 1209600000
 
 custom:
   redirect:
     app: myapp://oauth2/redirect
-    web: http://3.39.11.221:8080/login/ # 브라우저 테스트용(Spring Security 기본 로그인 경로로 돌아감)
+    web: http://3.39.11.221:8080/login/
 
 app:
   frontend-redirect-uri: https://auth.expo.io/@sbk03/adult-literacy-app
@@ -84,4 +84,11 @@ app:
 
 flask:
   api:
-    url: http://localhost:5000  # EC2 배포 시 Public IP로 변경
+    url: http://localhost:5000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method

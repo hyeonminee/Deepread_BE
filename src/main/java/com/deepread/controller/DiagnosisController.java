@@ -3,8 +3,8 @@ package com.deepread.controller;
 import com.deepread.dto.request.DiagnosisEvaluationRequestDto;
 import com.deepread.dto.request.DiagnosisResultRequestDto;
 import com.deepread.dto.response.DiagnosisEvaluationResponseDto;
-import com.deepread.dto.response.DiagnosisResultResponseDto;
 import com.deepread.dto.response.DiagnosisQuestionResponseDto;
+import com.deepread.dto.response.DiagnosisResultResponseDto;
 import com.deepread.entity.DiagnosisQuestion;
 import com.deepread.repository.DiagnosisQuestionRepository;
 import com.deepread.service.DiagnosisQuestionService;
@@ -13,6 +13,7 @@ import com.opencsv.CSVReader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/diagnosis")
 @RequiredArgsConstructor
+@Tag(name = "Diagnosis", description = "문해력 진단 관련 API")
 public class DiagnosisController {
 
     private final DiagnosisService diagnosisService;
@@ -36,7 +38,6 @@ public class DiagnosisController {
     private final DiagnosisQuestionRepository questionRepository;
     private final ModelMapper modelMapper;
 
-    // 진단 결과 저장
     @Operation(summary = "진단 결과 저장", description = "사용자의 진단 결과를 저장한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "진단 결과 저장 성공"),
@@ -49,15 +50,28 @@ public class DiagnosisController {
         return ResponseEntity.ok(responseDto);
     }
 
-    // 랜덤 문제 출제 (A:1, B:2, C:2)
-    @Operation(summary = "문해력 진단 문제 랜덤 출제", description = "A:1개, B:2개, C:2개 문제를 무작위로 반환")
+    @Operation(
+            summary = "문해력 진단 문제 랜덤 출제",
+            description = "A:1개, B:2개, C:2개 문제를 무작위로 반환한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문제 출제 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
     @GetMapping("/questions")
     public ResponseEntity<List<DiagnosisQuestionResponseDto>> getRandomQuestions() {
         return ResponseEntity.ok(diagnosisQuestionService.getMixedQuestions());
     }
 
-    // 사용자 채점
-    @Operation(summary = "문해력 진단 결과 평가", description = "사용자 응답을 기반으로 정답 여부를 판단하고 점수를 계산한다.")
+    @Operation(
+            summary = "문해력 진단 결과 평가",
+            description = "사용자 응답을 기반으로 정답 여부를 판단하고 점수를 계산한다. 반환 결과는 각 문항별 정답 여부 리스트와 점수이다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "평가 완료 및 점수 반환"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
     @PostMapping("/evaluate")
     public ResponseEntity<DiagnosisEvaluationResponseDto> evaluateAnswers(@RequestBody DiagnosisEvaluationRequestDto dto) {
         int correctCount = 0;
@@ -77,8 +91,14 @@ public class DiagnosisController {
         return ResponseEntity.ok(res);
     }
 
-    // CSV 일괄 등록
-    @Operation(summary = "문해력 진단 문제 일괄 등록", description = "CSV 파일을 업로드하여 문제를 DB에 일괄 등록한다.")
+    @Operation(
+            summary = "문해력 진단 문제 일괄 등록",
+            description = "CSV 파일의 각 행은 문제(type,id,passage,question,option1~4,answer)를 나타내며, 이를 DB에 저장한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "일괄 등록 성공"),
+            @ApiResponse(responseCode = "500", description = "CSV 처리 중 오류")
+    })
     @PostMapping("/questions/batch")
     public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) {
         try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
@@ -107,8 +127,11 @@ public class DiagnosisController {
         }
     }
 
-    // 전체 문제 조회 (관리자용)
-    @Operation(summary = "문해력 진단 문제 전체 조회 (관리자용)", description = "전체 문제를 관리용으로 조회한다.")
+    @Operation(summary = "문해력 진단 문제 전체 조회", description = "전체 문제를 관리용으로 조회한다. (관리자용)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "전체 문제 반환 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
     @GetMapping("/questions/admin")
     public ResponseEntity<List<DiagnosisQuestionResponseDto>> getAllQuestionsAdmin() {
         return ResponseEntity.ok(

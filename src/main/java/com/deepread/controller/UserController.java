@@ -6,14 +6,17 @@ import com.deepread.entity.User;
 import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "User", description = "사용자 정보 및 문해력 수준 관리 API")
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -29,10 +32,13 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @GetMapping("/profile")
-    public UserResponseDto getUserProfile(@AuthenticationPrincipal User user) {
-        return modelMapper.map(userService.getUserProfile(user.getId())
+    public UserResponseDto getUserProfile(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+        return modelMapper.map(
+                userService.getUserProfile(user.getId())
                         .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다.")),
-                UserResponseDto.class);
+                UserResponseDto.class
+        );
     }
 
     @Operation(summary = "레벨 수정", description = "현재 로그인한 사용자의 문해력 수준(Level)을 수정한다.")
@@ -43,10 +49,10 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @PutMapping("/level")
-    public String updateUserLevel(@AuthenticationPrincipal User user,
-                                  @RequestBody @Valid UpdateLevelRequestDto dto) {
+    public String updateUserLevel(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @RequestBody @Valid UpdateLevelRequestDto dto) {
         boolean updated = userService.updateLevel(user.getId(), dto.getNewLevel());
         return updated ? "User level updated successfully" : "User not found";
     }
-
 }
