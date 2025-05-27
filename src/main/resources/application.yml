@@ -7,7 +7,7 @@ spring:
     name: deepread-backend
 
   datasource:
-    url: jdbc:mysql://localhost:3306/deepread?serverTimezone=Asia/Seoul
+    url: jdbc:mysql://deepread-mysql:3306/deepread?serverTimezone=Asia/Seoul
     username: root
     password: REMOVED
 
