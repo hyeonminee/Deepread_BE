@@ -76,11 +76,11 @@ jwt:
 custom:
   redirect:
     app: myapp://oauth2/redirect
-    web: http://3.39.11.221:8080/login/
+    web: http://43.201.111.145:8080/login/
 
 app:
   frontend-redirect-uri: https://auth.expo.io/@sbk03/adult-literacy-app
-  base-url: http://13.209.77.190:8080
+  base-url: http://43.201.111.145:8080
 
 flask:
   api:
@@ -91,6 +91,4 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /index.html
-    enabled: true
-    operationsSorter: alpha
-    tagsSorter: alpha
+    operationsSorter: method
