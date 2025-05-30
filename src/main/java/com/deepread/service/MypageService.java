@@ -3,8 +3,8 @@ package com.deepread.service;
 import com.deepread.dto.response.MypageStatisticsDto;
 import com.deepread.dto.response.UserCalendarDto;
 import com.deepread.entity.SummaryFeedback;
-import com.deepread.entity.UserCalendar;
 import com.deepread.entity.QuizResult;
+import com.deepread.entity.UserCalendar;
 import com.deepread.repository.QuizResultRepository;
 import com.deepread.repository.SummaryFeedbackRepository;
 import com.deepread.repository.UserCalendarRepository;
@@ -27,7 +27,7 @@ public class MypageService {
         List<UserCalendar> calendarEntries = userCalendarRepository.findByUserId(userId);
 
         return calendarEntries.stream().map(entry -> {
-            LocalDate date = entry.getUser_date();
+            LocalDate date = entry.getUserDate();
             String contentTitle = entry.getContent() != null ? entry.getContent().getTitle() : "콘텐츠 없음";
             return new UserCalendarDto(date, date.getDayOfWeek(), contentTitle);
         }).collect(Collectors.toList());

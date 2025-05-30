@@ -19,14 +19,14 @@ public class UserReport {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private String reportMonth; // 'YYYY-MM'
+    private String reportMonth;
 
-    private Integer summaryAverage;
+    private Integer summaryAverage = 0;
 
-    private Float quizAccuracy;
+    private Float quizAccuracy = 0.0f;
 
-    private Integer activeDays;
+    private Integer activeDays = 0;
 
     @Enumerated(EnumType.STRING)
-    private User.Level user_level;
+    private User.Level user_level = User.Level.초급;
 }

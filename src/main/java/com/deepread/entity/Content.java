@@ -20,13 +20,20 @@ public class Content {
     private String title;
 
     @Lob
-    private String content; // 원문 텍스트
+    private String content;
 
     @Lob
-    private String aiSummary; // AI 기준 요약문
+    private String aiSummary;
 
     @Enumerated(EnumType.STRING)
     private User.Level level;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

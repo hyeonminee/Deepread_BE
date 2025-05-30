@@ -21,9 +21,17 @@ public class UserCalendar {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private LocalDate user_date;
+    @Column(nullable = false)
+    private LocalDate userDate;
 
     @ManyToOne
     @JoinColumn(name = "content_id")
     private Content content;
+
+    @PrePersist
+    public void prePersist() {
+        if (userDate == null) {
+            userDate = LocalDate.now();
+        }
+    }
 }

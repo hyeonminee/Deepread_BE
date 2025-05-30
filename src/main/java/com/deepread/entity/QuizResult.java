@@ -27,5 +27,15 @@ public class QuizResult {
 
     private Float accuracy;
 
-    private LocalDateTime submittedAt = LocalDateTime.now();
+    private LocalDateTime submittedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (submittedAt == null) {
+            submittedAt = LocalDateTime.now();
+        }
+        if (accuracy != null && (accuracy < 0.0f || accuracy > 100.0f)) {
+            throw new IllegalArgumentException("정확도(accuracy)는 0~100 사이여야 합니다.");
+        }
+    }
 }

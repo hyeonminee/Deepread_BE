@@ -7,15 +7,17 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "diagnosis_questions")
+@IdClass(DiagnosisQuestionId.class)
 @Getter
 @Setter
 @NoArgsConstructor
 public class DiagnosisQuestion {
 
     @Id
-    private Long id; // type 내에서 1~5 범위의 고정 id
+    private String type;  // 복합키 구성
 
-    private String type; // 'A', 'B', 'C'
+    @Id
+    private Long id;  // 복합키 구성
 
     @Column(columnDefinition = "TEXT")
     private String passage;
@@ -37,7 +39,6 @@ public class DiagnosisQuestion {
 
     private Integer answer;
 
-    // 복합 유니크 제약 (type + id)
     @PrePersist
     public void validateId() {
         if (id == null || id < 1 || id > 5) {
