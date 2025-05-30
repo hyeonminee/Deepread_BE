@@ -17,6 +17,10 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	// commons-logging 제거
+	all {
+		exclude group: 'commons-logging', module: 'commons-logging'
+	}
 }
 
 repositories {
@@ -25,11 +29,17 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.mysql:mysql-connector-j:8.3.0' // 버전 명시
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// OpenAPI
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
+	// DTO 매핑
 	implementation 'org.modelmapper:modelmapper:3.1.1'
+
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
@@ -37,32 +47,30 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	// OAuth2 Client (Kakao, Naver, Google 연동용)
+	// OAuth2 (Kakao, Google 등)
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-	// JWT (JSON Web Token)
+	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'javax.xml.bind:jaxb-api:2.3.0'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-	implementation 'com.google.code.gson:gson:2.8.9'
-	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 	implementation 'com.auth0:java-jwt:4.4.0'
 
-	// Lombok (코드 간결화용)
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-
-	// Spring Security 테스트용
-	testImplementation 'org.springframework.security:spring-security-test'
-
-	// 기타
+	// 기타 유틸리티
+	implementation 'com.google.code.gson:gson:2.8.9'
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 	implementation 'org.json:json:20231013'
 	implementation 'com.opencsv:opencsv:5.7.1'
 
-	// 테스트 시에도 검증 작동하게 하려면
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// 테스트용
+	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 }
 

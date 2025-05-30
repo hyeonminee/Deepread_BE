@@ -30,7 +30,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/deepread
+      SPRING_DATASOURCE_URL: jdbc:mysql://deepread-mysql:3306/deepread?serverTimezone=Asia/Seoul
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: REMOVED
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
