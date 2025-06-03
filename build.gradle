@@ -1,5 +1,5 @@
 plugins {
-        id 'java'
+	id 'java'
 	id 'org.springframework.boot' version '3.2.5'
 	id 'io.spring.dependency-management' version '1.1.4'
 }
@@ -72,6 +72,10 @@ dependencies {
 	// 테스트용
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+
+	// 크롤링 관련
+	implementation 'org.springframework.boot:spring-boot-starter-webflux' // WebClient
+	implementation 'org.jsoup:jsoup:1.17.2'
 }
 
 tasks.named('test') {

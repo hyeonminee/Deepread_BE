@@ -18,6 +18,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  jackson:
+    time-zone: Asia/Seoul
 
   security:
     oauth2:
