@@ -20,9 +20,11 @@ public class NewsArticle {
     private String title;
 
     @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String content;
 
     @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String aiSummary;
 
     private String originalUrl;
