@@ -2,14 +2,20 @@ package com.deepread.service;
 
 import com.deepread.client.AiSummaryClient;
 import com.deepread.dto.response.MedicalArticleResponseDto;
+import com.deepread.dto.response.MedicalArticleUploadResponseDto;
 import com.deepread.entity.MedicalArticle;
 import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.repository.MedicalArticleRepository;
+import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,9 +39,43 @@ public class MedicalArticleService {
                 .map(article -> modelMapper.map(article, MedicalArticleResponseDto.class));
     }
 
-    /**
-     * AI 서버로 요약 요청 후 DB에 aiSummary 저장
-     */
+    // CSV 파일 업로드 처리 (aiSummary는 null로 저장됨)
+    public MedicalArticleUploadResponseDto uploadCsv(MultipartFile file) throws Exception {
+        int success = 0;
+        int failure = 0;
+        List<MedicalArticle> articles = new ArrayList<>();
+
+        try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+            List<String[]> rows = reader.readAll();
+
+            for (int i = 1; i < rows.size(); i++) {
+                try {
+                    String theme = rows.get(i)[1].trim(); // 'theme' 필드
+                    String content = rows.get(i)[2].trim(); // 'content' 필드
+
+                    MedicalArticle article = MedicalArticle.builder()
+                            .theme(theme)
+                            .content(content)
+                            .aiSummary(null) // 요약은 나중에 별도 호출
+                            .build();
+
+                    articles.add(article);
+                    success++;
+                } catch (Exception e) {
+                    failure++;
+                }
+            }
+
+            medicalArticleRepository.saveAll(articles);
+        }
+
+        return MedicalArticleUploadResponseDto.builder()
+                .successCount(success)
+                .failureCount(failure)
+                .build();
+    }
+
+    // AI 서버로 요약 요청 후 DB에 aiSummary 저장
     @Transactional
     public MedicalArticleResponseDto summarizeAndUpdate(Long id) {
         MedicalArticle article = medicalArticleRepository.findById(id)

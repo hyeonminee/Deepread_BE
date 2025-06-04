@@ -15,13 +15,11 @@ public class MedicalArticle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;  // 콘텐츠 제목
+    private String theme;
 
     @Column(columnDefinition = "TEXT")
-    private String content;  // 원문 (XML 파싱 결과)
-
-    private String sourceUrl;  // 출처 URL (선택사항)
+    private String content;
 
     @Column(columnDefinition = "TEXT")
-    private String aiSummary;  // AI 요약 결과
+    private String aiSummary;
 }

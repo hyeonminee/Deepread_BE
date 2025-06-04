@@ -1,6 +1,7 @@
 package com.deepread.controller;
 
 import com.deepread.dto.response.MedicalArticleResponseDto;
+import com.deepread.dto.response.MedicalArticleUploadResponseDto;
 import com.deepread.service.MedicalArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -43,6 +45,19 @@ public class MedicalArticleController {
         return medicalArticleService.getArticleById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "의료 콘텐츠 CSV 업로드", description = "CSV 파일을 업로드하여 콘텐츠를 DB에 저장한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "업로드 성공"),
+            @ApiResponse(responseCode = "400", description = "파일 파싱 실패")
+    })
+    @PostMapping("/upload")
+    public ResponseEntity<MedicalArticleUploadResponseDto> uploadCsv(
+            @Parameter(description = "CSV 파일", required = true)
+            @RequestParam("file") MultipartFile file
+    ) throws Exception {
+        return ResponseEntity.ok(medicalArticleService.uploadCsv(file));
     }
 
     @Operation(summary = "의료 콘텐츠 AI 요약 요청", description = "AI 서버에 원문 콘텐츠를 전송해 요약문을 생성하고 DB에 저장한다.")
