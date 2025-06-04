@@ -1,14 +1,16 @@
 package com.deepread.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "뉴스 기사 응답 DTO")
+@Getter
+@Setter
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@Schema(description = "뉴스 기사 응답 DTO")
 public class NewsArticleResponseDto {
     @Schema(description = "뉴스 ID", example = "1")
     private Long id;
