@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Data
 @AllArgsConstructor
 public class NewsArticleResponseDto {
+    @Schema(description = "뉴스 ID", example = "1")
+    private Long id;
+
     @Schema(description = "뉴스 카테고리 (예: 경제, 사회)", example = "경제")
     private String category;
 
