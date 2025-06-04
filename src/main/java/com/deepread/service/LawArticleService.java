@@ -28,20 +28,20 @@ public class LawArticleService {
     private final ModelMapper modelMapper;
     private final AiSummaryClient aiSummaryClient;
 
+     // 전체 법률 콘텐츠 조회
     public List<LawArticleResponseDto> getAllArticles() {
         return lawArticleRepository.findAll().stream()
                 .map(article -> modelMapper.map(article, LawArticleResponseDto.class))
                 .collect(Collectors.toList());
     }
 
+    // ID 기준 단일 콘텐츠 조회
     public Optional<LawArticleResponseDto> getArticleById(Long id) {
         return lawArticleRepository.findById(id)
                 .map(article -> modelMapper.map(article, LawArticleResponseDto.class));
     }
 
-    /**
-     * CSV 파일 업로드 처리 (aiSummary는 null로 저장됨)
-     */
+    // CSV 파일 업로드 처리 (aiSummary는 null로 저장됨)
     public LawArticleUploadResponseDto uploadCsv(MultipartFile file) throws Exception {
         int success = 0;
         int failure = 0;
@@ -50,24 +50,24 @@ public class LawArticleService {
             List<String[]> rows = reader.readAll();
             List<LawArticle> articles = new ArrayList<>();
 
-            for (int i = 1; i < rows.size(); i++) {
+            for (int i = 1; i < rows.size(); i++) {  // 헤더가 존재한다고 가정
                 try {
                     String[] row = rows.get(i);
-                    String theme = row[1].trim();
-                    String question = row[2].trim();
-                    String answer = row[3].trim();
-                    String content = question + "\n\n" + answer;
+
+                    String theme = row[1].trim();     // 'theme' 필드
+                    String content = row[2].trim();   // 'content' 필드
 
                     LawArticle article = LawArticle.builder()
                             .theme(theme)
                             .content(content)
-                            .aiSummary(null)
+                            .aiSummary(null)  // 요약은 나중에 별도 호출
                             .build();
 
                     articles.add(article);
                     success++;
                 } catch (Exception e) {
                     failure++;
+                    e.printStackTrace();  // 에러 추적
                 }
             }
 
@@ -80,9 +80,7 @@ public class LawArticleService {
                 .build();
     }
 
-    /**
-     * AI 서버로 요약 요청 후 DB에 aiSummary 저장
-     */
+    // AI 서버로 요약 요청 후 DB에 aiSummary 저장
     @Transactional
     public LawArticleResponseDto summarizeAndUpdate(Long id) {
         LawArticle article = lawArticleRepository.findById(id)
@@ -99,5 +97,4 @@ public class LawArticleService {
 
         return modelMapper.map(article, LawArticleResponseDto.class);
     }
-
 }

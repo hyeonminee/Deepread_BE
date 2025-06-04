@@ -47,7 +47,7 @@ public class LawArticleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "법률 콘텐츠 CSV 업로드", description = "CSV 파일을 업로드하여 콘텐츠를 DB에 저장한다. (question+answer → content)")
+    @Operation(summary = "법률 콘텐츠 CSV 업로드", description = "CSV 파일을 업로드하여 콘텐츠를 DB에 저장한다. (content 컬럼 기준)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "업로드 성공"),
             @ApiResponse(responseCode = "400", description = "파일 파싱 실패")
