@@ -22,25 +22,25 @@ public class ContentController {
 
     private final ContentService contentService;
 
-    @Operation(
-            summary = "추천 콘텐츠 조회",
-            description = "사용자의 문해력 레벨(초급, 중급, 고급)에 따라 적절한 콘텐츠를 추천한다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "추천 콘텐츠 반환 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 레벨 입력"),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
-    })
-    @GetMapping("/recommend")
-    public List<Content> getRecommendedContents(
-            @Parameter(
-                    name = "level",
-                    description = "사용자의 문해력 수준 (초급, 중급, 고급 중 하나)",
-                    example = "초급"
-            )
-            @RequestParam String level) {
-        return contentService.getRecommendedContents(User.Level.valueOf(level));
-    }
+//    @Operation(
+//            summary = "추천 콘텐츠 조회",
+//            description = "사용자의 문해력 레벨(초급, 중급, 고급)에 따라 적절한 콘텐츠를 추천한다."
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "추천 콘텐츠 반환 성공"),
+//            @ApiResponse(responseCode = "400", description = "잘못된 레벨 입력"),
+//            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+//    })
+//    @GetMapping("/recommend")
+//    public List<Content> getRecommendedContents(
+//            @Parameter(
+//                    name = "level",
+//                    description = "사용자의 문해력 수준 (초급, 중급, 고급 중 하나)",
+//                    example = "초급"
+//            )
+//            @RequestParam String level) {
+//        return contentService.getRecommendedContents(User.Level.valueOf(level));
+//    }
 
     @Operation(
             summary = "콘텐츠 상세 조회",

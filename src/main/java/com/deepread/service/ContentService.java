@@ -16,9 +16,9 @@ public class ContentService {
     private final ContentRepository contentRepository;
 
     // 사용자 수준에 따른 뉴스/문서 추천
-    public List<Content> getRecommendedContents(User.Level level) {
-        return contentRepository.findByLevel(level);
-    }
+//    public List<Content> getRecommendedContents(User.Level level) {
+//        return contentRepository.findByLevel(level);
+//    }
 
     // ID로 문서 상세 조회
     public Optional<Content> getContentById(Long id) {
