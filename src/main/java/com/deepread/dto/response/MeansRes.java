@@ -27,23 +27,26 @@ public class MeansRes {
 
     }
 
+    @Getter
     public static class Item {
         private String link;
         private String pos;
-        @Getter
-        @Setter
         private List<Sense> sense;
         private int sup_no;
         private int target_code;
         private String word;
-
     }
 
-    public static class Sense {
-        private int sense_order;
-        @Getter
-        @Setter
-        private String definition;
 
+    @Getter
+    @Setter
+    public static class Sense {
+        private int sense_order;       // 뜻풀이 순서
+        private String definition;     // 뜻풀이
+        private String type;           // 의미의 종류 (예: 본뜻, 비유적 표현 등)
+        private String pattern;        // 문형 (예: [동사] ~을 하다)
+        private String example;        // 용례 (예문)
+        private String proverb;        // 관용구, 속담
+        private String usage;          // 사용 범위
     }
 }

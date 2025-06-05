@@ -3,6 +3,7 @@ package com.deepread.controller;
 import com.deepread.dto.request.ChatbotLogRequestDto;
 import com.deepread.dto.response.ChatbotLogResponseDto;
 import com.deepread.dto.response.ErrorResponse;
+import com.deepread.dto.response.MeansResponseDto;
 import com.deepread.service.ChatbotService;
 import com.deepread.service.OpenAPIService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,18 +30,18 @@ public class ChatbotController {
     private final ChatbotService chatbotService;
     private final OpenAPIService openAPIService;
 
+    @GetMapping("/meaning")
     @Operation(
             summary = "단어 의미만 조회",
-            description = "외부 표준국어대사전 API를 통해 입력된 단어의 정의를 반환합니다."
+            description = "외부 표준국어대사전 API를 통해 입력된 단어의 의미를 상세 항목(뜻, 문형, 예문 등)으로 반환합니다."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "단어 의미 조회 성공",
-                    content = @Content(mediaType = "text/plain")),
+                    content = @Content(schema = @Schema(implementation = MeansResponseDto.class))),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/meaning")
-    public ResponseEntity<String> getMeaning(
+    public ResponseEntity<MeansResponseDto> getMeaning(
             @Parameter(description = "의미를 조회할 단어", example = "사과", required = true)
             @RequestParam String word
     ) throws IOException {
@@ -66,11 +67,11 @@ public class ChatbotController {
             HttpServletRequest request
     ) {
         try {
-            String meaning = openAPIService.getMeans(word);
+            MeansResponseDto meaningDto = openAPIService.getMeans(word);
             ChatbotLogRequestDto dto = new ChatbotLogRequestDto();
             dto.setUserId(userId);
             dto.setWord(word);
-            dto.setResponse(meaning);
+            dto.setResponse(meaningDto.getDefinition()); // DB에는 요약된 정의만 저장
             return ResponseEntity.ok(chatbotService.saveChatbotLog(dto));
         } catch (IOException e) {
             ErrorResponse error = ErrorResponse.builder()
