@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Getter
 @Setter
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "뉴스 기사 응답 DTO")

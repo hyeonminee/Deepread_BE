@@ -1,11 +1,14 @@
 package com.deepread.repository;
 
 import com.deepread.entity.MedicalArticle;
+import com.deepread.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface MedicalArticleRepository extends JpaRepository<MedicalArticle, Long> {
 
-    // 향후 title 기반 검색 등 추가 가능
+    List<MedicalArticle> findByLevel(User.Level level);
 }

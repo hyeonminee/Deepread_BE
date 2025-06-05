@@ -1,5 +1,6 @@
 package com.deepread.dto.response;
 
+import com.deepread.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -21,4 +22,7 @@ public class LawArticleResponseDto {
 
     @Schema(description = "AI 생성 요약문", nullable = true)
     private String aiSummary;
+
+    @Schema(description = "문해력 수준", example = "초급")
+    private User.Level level;
 }

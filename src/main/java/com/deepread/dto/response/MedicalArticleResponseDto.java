@@ -1,5 +1,6 @@
 package com.deepread.dto.response;
 
+import com.deepread.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -24,4 +25,7 @@ public class MedicalArticleResponseDto {
 
     @Schema(description = "AI 요약 결과", example = "심근경색은 초기 흉통과 관련된 질병이다.")
     private String aiSummary;
+
+    @Schema(description = "문해력 수준", example = "고급")
+    private User.Level level;
 }

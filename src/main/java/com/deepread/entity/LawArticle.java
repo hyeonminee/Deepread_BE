@@ -22,4 +22,8 @@ public class LawArticle {
 
     @Column(columnDefinition = "TEXT")
     private String aiSummary;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private User.Level level;
 }

@@ -1,6 +1,7 @@
 package com.deepread.repository;
 
 import com.deepread.entity.LawArticle;
+import com.deepread.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,6 +9,8 @@ import java.util.List;
 
 @Repository
 public interface LawArticleRepository extends JpaRepository<LawArticle, Long> {
+
+    List<LawArticle> findByLevel(User.Level level);
 
     // 향후 카테고리(주제)별 조회용
     List<LawArticle> findByTheme(String theme);

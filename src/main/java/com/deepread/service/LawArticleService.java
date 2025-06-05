@@ -4,6 +4,7 @@ import com.deepread.client.AiSummaryClient;
 import com.deepread.dto.response.LawArticleResponseDto;
 import com.deepread.dto.response.LawArticleUploadResponseDto;
 import com.deepread.entity.LawArticle;
+import com.deepread.entity.User;
 import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.repository.LawArticleRepository;
 import com.opencsv.CSVReader;
@@ -43,6 +44,12 @@ public class LawArticleService {
                 .map(article -> modelMapper.map(article, LawArticleResponseDto.class));
     }
 
+    public List<LawArticleResponseDto> getArticlesByLevel(User.Level level) {
+        return lawArticleRepository.findByLevel(level).stream()
+                .map(article -> modelMapper.map(article, LawArticleResponseDto.class))
+                .collect(Collectors.toList());
+    }
+
     // CSV 파일 업로드 처리 (aiSummary는 null로 저장됨)
     public LawArticleUploadResponseDto uploadCsv(MultipartFile file) throws Exception {
         int success = 0;
@@ -52,17 +59,21 @@ public class LawArticleService {
             List<String[]> rows = reader.readAll();
             List<LawArticle> articles = new ArrayList<>();
 
+
             for (int i = 1; i < rows.size(); i++) {  // 헤더가 존재한다고 가정
                 try {
                     String[] row = rows.get(i);
 
                     String theme = row[1].trim();     // 'theme' 필드
                     String content = row[2].trim();   // 'content' 필드
+                    String levelText = row[3].trim(); // 'level' 필드
+                    User.Level level = User.Level.valueOf(levelText); // "초급", "중급", "고급"과 정확히 일치해야 함
 
                     LawArticle article = LawArticle.builder()
                             .theme(theme)
                             .content(content)
                             .aiSummary(null)  // 요약은 나중에 별도 호출
+                            .level(level)
                             .build();
 
                     articles.add(article);

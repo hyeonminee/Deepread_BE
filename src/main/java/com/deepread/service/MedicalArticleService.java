@@ -4,6 +4,7 @@ import com.deepread.client.AiSummaryClient;
 import com.deepread.dto.response.MedicalArticleResponseDto;
 import com.deepread.dto.response.MedicalArticleUploadResponseDto;
 import com.deepread.entity.MedicalArticle;
+import com.deepread.entity.User;
 import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.repository.MedicalArticleRepository;
 import com.opencsv.CSVReader;
@@ -39,6 +40,12 @@ public class MedicalArticleService {
     public Optional<MedicalArticleResponseDto> getArticleById(Long id) {
         return medicalArticleRepository.findById(id)
                 .map(article -> modelMapper.map(article, MedicalArticleResponseDto.class));
+    }
+
+    public List<MedicalArticleResponseDto> getArticlesByLevel(User.Level level) {
+        return medicalArticleRepository.findByLevel(level).stream()
+                .map(article -> modelMapper.map(article, MedicalArticleResponseDto.class))
+                .collect(Collectors.toList());
     }
 
     // CSV 파일 업로드 처리 (aiSummary는 null로 저장됨)

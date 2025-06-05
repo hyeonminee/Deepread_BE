@@ -2,6 +2,7 @@ package com.deepread.controller;
 
 import com.deepread.dto.response.MedicalArticleResponseDto;
 import com.deepread.dto.response.MedicalArticleUploadResponseDto;
+import com.deepread.entity.User;
 import com.deepread.service.MedicalArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +32,12 @@ public class MedicalArticleController {
     public List<MedicalArticleResponseDto> getAll() {
         return medicalArticleService.getAllArticles();
     }
+
+    @GetMapping("/level")
+    public List<MedicalArticleResponseDto> getByLevel(@RequestParam("level") User.Level level) {
+        return medicalArticleService.getArticlesByLevel(level);
+    }
+
 
     @Operation(summary = "의료 콘텐츠 상세 조회", description = "ID를 기반으로 의료 콘텐츠 원문을 반환한다.")
     @ApiResponses(value = {

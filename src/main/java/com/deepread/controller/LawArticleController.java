@@ -2,6 +2,7 @@ package com.deepread.controller;
 
 import com.deepread.dto.response.LawArticleResponseDto;
 import com.deepread.dto.response.LawArticleUploadResponseDto;
+import com.deepread.entity.User;
 import com.deepread.service.LawArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +32,12 @@ public class LawArticleController {
     public List<LawArticleResponseDto> getAll() {
         return lawArticleService.getAllArticles();
     }
+
+    @GetMapping("/level")
+    public List<LawArticleResponseDto> getByLevel(@RequestParam("level") User.Level level) {
+        return lawArticleService.getArticlesByLevel(level);
+    }
+
 
     @Operation(summary = "법률 콘텐츠 상세 조회", description = "ID를 기준으로 법률 콘텐츠 원문 및 요약을 반환한다.")
     @ApiResponses({
