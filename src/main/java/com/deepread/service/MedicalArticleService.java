@@ -61,11 +61,14 @@ public class MedicalArticleService {
                 try {
                     String theme = rows.get(i)[1].trim(); // 'theme' 필드
                     String content = rows.get(i)[2].trim(); // 'content' 필드
+                    String levelText = rows.get(i)[3].trim(); // 'level' 필드
+                    User.Level level = User.Level.valueOf(levelText); // "초급", "중급", "고급"과 정확히 일치해야 함
 
                     MedicalArticle article = MedicalArticle.builder()
                             .theme(theme)
                             .content(content)
                             .aiSummary(null) // 요약은 나중에 별도 호출
+                            .level(level)
                             .build();
 
                     articles.add(article);
