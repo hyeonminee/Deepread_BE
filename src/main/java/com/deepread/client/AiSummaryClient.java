@@ -16,7 +16,7 @@ public class AiSummaryClient {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${flask.api.url}/generate-summary")
-    private String summaryApiUrl;  // ex) http://localhost:5000/generate-summary
+    private String summaryApiUrl;  // ex) http://3.35.42.252:5000/generate-summary
 
     public String requestSummary(String content) throws Exception {
         AiSummaryRequestDto requestDto = AiSummaryRequestDto.builder().text(content).build();

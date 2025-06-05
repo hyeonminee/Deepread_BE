@@ -19,16 +19,14 @@ public class ChatbotService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    /**
-     * 사용자 질문/응답 로그 저장
-     */
+    // 사용자 단어/응답 로그 저장
     public ChatbotLogResponseDto saveChatbotLog(ChatbotLogRequestDto dto) {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
 
         ChatbotLog log = new ChatbotLog();
         log.setUser(user);
-        log.setQuestion(dto.getQuestion());
+        log.setWord(dto.getWord());
         log.setResponse(dto.getResponse());
 
         ChatbotLog saved = chatbotLogRepository.save(log);

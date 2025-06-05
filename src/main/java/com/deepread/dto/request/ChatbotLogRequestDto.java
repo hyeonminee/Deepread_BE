@@ -14,12 +14,11 @@ public class ChatbotLogRequestDto {
     @NotNull(message = "userId는 필수입니다.")
     private Long userId;
 
-    @Schema(description = "사용자의 질문", example = "오늘 날씨 어때?")
-    @NotBlank(message = "질문은 비어 있을 수 없습니다.")
-    private String question;
+    @Schema(description = "질문한 단어", example = "사과")
+    @NotBlank(message = "단어는 비어 있을 수 없습니다.")
+    private String word;
 
-    @Schema(description = "챗봇의 응답", example = "오늘은 맑고 기온은 23도입니다.")
+    @Schema(description = "챗봇 응답", example = "사과는 과일로, 빨갛고 달콤한 맛이 있습니다.")
     @NotBlank(message = "응답은 비어 있을 수 없습니다.")
     private String response;
 }
-

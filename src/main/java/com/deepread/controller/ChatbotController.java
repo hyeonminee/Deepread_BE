@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Chatbot", description = "챗봇 대화 로그 관련 API")
+@Tag(name = "Chatbot", description = "단어 뜻 조회 및 로그 API")
 @RestController
 @RequestMapping("/api/chatbot")
 @RequiredArgsConstructor
@@ -22,8 +22,8 @@ public class ChatbotController {
     private final ChatbotService chatbotService;
 
     @Operation(
-            summary = "챗봇 대화 로그 저장",
-            description = "사용자의 질문 및 챗봇 응답을 DB에 저장한다."
+            summary = "단어 의미 조회 로그 저장",
+            description = "사용자가 입력한 단어와 챗봇 응답을 저장한다."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그 저장 성공"),
@@ -32,7 +32,7 @@ public class ChatbotController {
     })
     @PostMapping("/log")
     public ResponseEntity<ChatbotLogResponseDto> saveChatLog(
-            @Parameter(description = "사용자의 질문 및 챗봇 응답 내용이 포함된 DTO", required = true)
+            @Parameter(description = "사용자가 입력한 단어와 응답 DTO", required = true)
             @RequestBody @Valid ChatbotLogRequestDto dto) {
         ChatbotLogResponseDto responseDto = chatbotService.saveChatbotLog(dto);
         return ResponseEntity.ok(responseDto);

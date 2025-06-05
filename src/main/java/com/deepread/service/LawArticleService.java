@@ -8,6 +8,7 @@ import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.repository.LawArticleRepository;
 import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class LawArticleService {
 
@@ -87,11 +89,16 @@ public class LawArticleService {
                 .orElseThrow(() -> new ResourceNotFoundException("LawArticle not found"));
 
         try {
+            log.info("LawArticle ID={} 요약 요청 시작", id);
+
             String content = article.getContent();
             String aiSummary = aiSummaryClient.requestSummary(content);
             article.setAiSummary(aiSummary);
             lawArticleRepository.save(article);
+
+            log.info("LawArticle ID={} 요약 저장 완료", id);
         } catch (Exception e) {
+            log.error("LawArticle ID={} 요약 실패: {}", id, e.getMessage(), e);
             throw new RuntimeException("AI 요약 요청 실패: " + e.getMessage(), e);
         }
 

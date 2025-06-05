@@ -29,6 +29,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
     }
 
+    @ExceptionHandler(CustomEvaluationException.class)
+    public ResponseEntity<ErrorResponse> handleCustomEvaluation(CustomEvaluationException e, HttpServletRequest request) {
+        return buildErrorResponse(e.getMessage(), HttpStatus.BAD_GATEWAY, request.getRequestURI());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleOther(Exception e, HttpServletRequest request) {
         log.error("Unhandled exception occurred", e);

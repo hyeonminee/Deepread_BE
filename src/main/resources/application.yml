@@ -18,6 +18,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          time_zone: Asia/Seoul
   jackson:
     time-zone: Asia/Seoul
 
@@ -86,7 +88,7 @@ app:
 
 flask:
   api:
-    url: http://localhost:5000
+    url: http://3.35.42.252:5000
 
 springdoc:
   api-docs:

@@ -19,7 +19,7 @@ public class NewsSummaryScheduler {
     private final NewsArticleRepository newsArticleRepository;
     private final AiSummaryClient aiSummaryClient;
 
-    @Scheduled(cron = "0 0 8 * * *", zone = "Asia/Seoul") // 매일 오전 8시
+    @Scheduled(cron = "0 0 20 * * *", zone = "Asia/Seoul") // 매일 오전 8시
     @Transactional
     public void summarizeNewsWithoutAiSummary() {
         log.info("[AI 요약 스케줄러 시작] aiSummary=null인 뉴스 기사 요약 시작");

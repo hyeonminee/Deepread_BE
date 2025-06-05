@@ -16,8 +16,8 @@ public class ChatbotLogResponseDto {
     @Schema(description = "사용자 ID")
     private Long userId;
 
-    @Schema(description = "사용자의 질문")
-    private String question;
+    @Schema(description = "질문한 단어")
+    private String word;
 
     @Schema(description = "챗봇의 응답")
     private String response;

@@ -1,11 +1,9 @@
 package com.deepread.service;
 
-import com.deepread.dto.request.QuizAnswerValidationRequestDto;
 import com.deepread.dto.request.QuizResultRequestDto;
 import com.deepread.dto.response.QuizAnswerValidationResponseDto;
 import com.deepread.dto.response.QuizQuestionResponseDto;
 import com.deepread.dto.response.QuizResultResponseDto;
-import com.deepread.dto.response.QuizStatisticsResponseDto;
 import com.deepread.entity.QuizLevel;
 import com.deepread.entity.QuizQuestion;
 import com.deepread.entity.QuizResult;
@@ -24,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,26 +106,6 @@ public class QuizService {
         return modelMapper.map(saved, QuizResultResponseDto.class);
     }
 
-    // 월별 통계
-    public QuizStatisticsResponseDto getMonthlyStatistics(Long userId) {
-        List<QuizResult> results = quizResultRepository.findByUserId(userId);
-        YearMonth currentMonth = YearMonth.now();
-
-        List<QuizResult> filtered = results.stream()
-                .filter(r -> YearMonth.from(r.getSubmittedAt()).equals(currentMonth))
-                .toList();
-
-        int attempts = filtered.size();
-        float avgAccuracy = (attempts > 0) ?
-                (float) filtered.stream().mapToDouble(QuizResult::getAccuracy).average().orElse(0) : 0f;
-
-        return QuizStatisticsResponseDto.builder()
-                .userId(userId)
-                .month(currentMonth.toString())
-                .attemptCount(attempts)
-                .averageAccuracy(avgAccuracy)
-                .build();
-    }
 
     // 단일 문제 조회
     public QuizQuestionResponseDto getQuestionById(Long id) {

@@ -8,6 +8,7 @@ import com.deepread.exception.ResourceNotFoundException;
 import com.deepread.repository.MedicalArticleRepository;
 import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MedicalArticleService {
 
@@ -82,11 +84,16 @@ public class MedicalArticleService {
                 .orElseThrow(() -> new ResourceNotFoundException("MedicalArticle not found"));
 
         try {
+            log.info("MedicalArticle ID={} 요약 요청 시작", id);
+
             String content = article.getContent();
             String aiSummary = aiSummaryClient.requestSummary(content);
             article.setAiSummary(aiSummary);
             medicalArticleRepository.save(article);
+
+            log.info("MedicalArticle ID={} 요약 저장 완료", id);
         } catch (Exception e) {
+            log.error("MedicalArticle ID={} 요약 실패: {}", id, e.getMessage(), e);
             throw new RuntimeException("AI 요약 요청 실패: " + e.getMessage(), e);
         }
 
