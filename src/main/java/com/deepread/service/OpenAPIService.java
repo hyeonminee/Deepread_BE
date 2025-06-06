@@ -11,6 +11,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +29,7 @@ public class OpenAPIService {
     public MeansResponseDto getMeans(String word) throws IOException {
         // JSON 요청 본문 생성
         ObjectMapper objectMapper = new ObjectMapper();
-        String requestBody = objectMapper.writeValueAsString(
-                new EtriRequest(new EtriArgument(word))
-        );
+        String requestBody = objectMapper.writeValueAsString(new EtriRequest(new EtriArgument(word)));
 
         // HTTP POST 요청 생성
         URL url = new URL(apiUrl);
@@ -61,31 +61,48 @@ public class OpenAPIService {
 
         // 응답 오류 처리
         if (returnObject.isMissingNode()) {
-            throw new IOException("Invalid API response");
+            throw new IOException("Invalid API response: 'return_object' 없음");
         }
 
-        // 단어 정보 필드 추출
-        String wordText = returnObject.path("Word").asText();                       // 단어
-        String pos = returnObject.path("WordInfo").path("POS").asText();           // 품사
-        String definition = returnObject.path("WordInfo").path("Definition").asText(); // 뜻풀이
-        String hanja = returnObject.path("WordInfo").path("Origin").asText();      // 한자
-        String example = returnObject.path("WordInfo").path("Example").asText();   // 예문
-        String synonym = returnObject.path("Synonym").toString();                  // 유의어
-        String antonym = returnObject.path("Antonym").toString();                  // 반의어
+        // WordInfo는 배열이므로 첫 번째 요소만 사용
+        JsonNode wordInfoNode = returnObject.path("WordInfo");
+        if (!wordInfoNode.isArray() || wordInfoNode.isEmpty()) {
+            throw new IOException("단어 정보가 존재하지 않습니다.");
+        }
+        JsonNode info = wordInfoNode.get(0);
 
-        // DTO로 변환 후 반환
+        // 필드 파싱
+        String wordText = returnObject.path("Word").asText();
+        String pos = info.path("POS").asText();
+        String definition = info.path("Definition").asText();
+        String hanja = info.path("Origin").asText();
+        String example = info.path("Example").asText();
+
+        List<String> synonymList = new ArrayList<>();
+        JsonNode synNode = returnObject.path("Synonym");
+        if (synNode.isArray()) {
+            synNode.forEach(n -> synonymList.add(n.asText()));
+        }
+
+        List<String> antonymList = new ArrayList<>();
+        JsonNode antNode = returnObject.path("Antonym");
+        if (antNode.isArray()) {
+            antNode.forEach(n -> antonymList.add(n.asText()));
+        }
+
+        // DTO 반환
         return MeansResponseDto.builder()
                 .word(wordText)
                 .pos(pos)
                 .definition(definition)
                 .hanja(hanja)
                 .example(example)
-                .synonym(synonym)
-                .antonym(antonym)
+                .synonym(synonymList)
+                .antonym(antonymList)
                 .build();
     }
 
-    // 내부 클래스: 요청 본문 포맷 정의
+    // 내부 클래스: 요청 포맷
     static class EtriRequest {
         public EtriArgument argument;
 
@@ -94,7 +111,6 @@ public class OpenAPIService {
         }
     }
 
-    // 내부 클래스: 단어 인자를 포함한 구조
     static class EtriArgument {
         public String word;
 
