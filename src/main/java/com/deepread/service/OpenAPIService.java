@@ -1,9 +1,12 @@
 package com.deepread.service;
 
 import com.deepread.dto.response.MeansResponseDto;
+import com.deepread.dto.response.MeansResponseDto.MeaningDetail;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,25 +16,27 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class OpenAPIService {
+
     private static final Logger log = LoggerFactory.getLogger(OpenAPIService.class);
 
-
+    // ETRI API 키와 URL
     private final String accessKey = "REMOVED";
     private final String apiUrl = "http://aiopen.etri.re.kr:8000/WiseWWN/Word";
 
+    /**
+     * 주어진 단어에 대해 ETRI 어휘 API를 호출하여 뜻, 품사, 유의어, 반의어를 반환합니다.
+     */
     @Transactional(readOnly = true)
     public MeansResponseDto getMeans(String word) throws IOException {
         // 요청 JSON 생성
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(new EtriRequest(new EtriArgument(word)));
 
-        // HTTP POST 요청 설정
+        // HTTP 연결 설정
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -39,7 +44,7 @@ public class OpenAPIService {
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.setDoOutput(true);
 
-        // 요청 본문 전송
+        // 요청 전송
         try (OutputStream os = connection.getOutputStream()) {
             os.write(requestBody.getBytes(StandardCharsets.UTF_8));
         }
@@ -54,61 +59,72 @@ public class OpenAPIService {
         }
         log.info("ETRI 응답 원본: {}", response);
 
+        // 응답 파싱
         JsonNode root = objectMapper.readTree(response.toString());
 
-        // result code 확인
+        // 결과 코드 확인
         int resultCode = root.path("result").asInt(-1);
         if (resultCode != 0) {
             throw new IOException("ETRI API 응답 실패 (result=" + resultCode + ")");
         }
 
-        // return_object 확인
+        // return_object 추출
         JsonNode returnObject = root.path("return_object");
         if (returnObject.isMissingNode()) {
             throw new IOException("'return_object' 없음");
         }
 
-        // Word와 WordInfo 리스트 추출
-        String wordText = returnObject.path("WWN WordInfo").get(0).path("Word").asText(null);
-        JsonNode wordInfoArray = returnObject.path("WWN WordInfo").get(0).path("WordInfo");
-
-        if (wordText == null || wordInfoArray == null || !wordInfoArray.isArray() || wordInfoArray.isEmpty()) {
-            throw new IOException("단어 정보 누락");
+        // 'WWN WordInfo' 배열에서 첫 항목 추출
+        JsonNode wordInfoGroup = returnObject.path("WWN WordInfo");
+        if (!wordInfoGroup.isArray() || wordInfoGroup.isEmpty()) {
+            throw new IOException("'WWN WordInfo' 항목이 비어 있음");
         }
 
-        JsonNode info = wordInfoArray.get(0); // 첫 번째 의미 사용
+        JsonNode wordNode = wordInfoGroup.get(0);
+        String wordText = wordNode.path("Word").asText(null);
 
-        // 필수 정보 파싱 (null or blank 확인)
-        String pos = info.path("POS").asText(null);
-        String definition = info.path("Definition").asText(null);
-        if (pos == null || pos.isBlank() || definition == null || definition.isBlank()) {
-            throw new IOException("POS 또는 Definition 누락");
+        // 다의어 정의 정보 추출
+        JsonNode wordInfoArray = wordNode.path("WordInfo");
+        if (!wordInfoArray.isArray() || wordInfoArray.isEmpty()) {
+            throw new IOException("WordInfo 배열 없음 또는 비어 있음");
         }
 
-        // 유의어/반의어 파싱
+        List<MeaningDetail> meaningList = new ArrayList<>();
+        for (JsonNode info : wordInfoArray) {
+            String pos = info.path("POS").asText(null);
+            String definition = info.path("Definition").asText(null);
+            if (pos != null && !pos.isBlank() && definition != null && !definition.isBlank()) {
+                meaningList.add(MeaningDetail.builder()
+                        .pos(pos)
+                        .definition(definition)
+                        .build());
+            }
+        }
+
+        // 유의어 추출
         List<String> synonymList = new ArrayList<>();
-        JsonNode synArray = returnObject.path("WWN WordInfo").get(0).path("Synonym");
-        if (synArray != null && synArray.isArray()) {
-            synArray.forEach(n -> synonymList.add(n.asText()));
+        JsonNode synonymArray = wordNode.path("Synonym");
+        if (synonymArray != null && synonymArray.isArray()) {
+            synonymArray.forEach(n -> synonymList.add(n.asText()));
         }
 
+        // 반의어 추출
         List<String> antonymList = new ArrayList<>();
-        JsonNode antArray = returnObject.path("WWN WordInfo").get(0).path("Antonym");
-        if (antArray != null && antArray.isArray()) {
-            antArray.forEach(n -> antonymList.add(n.asText()));
+        JsonNode antonymArray = wordNode.path("Antonym");
+        if (antonymArray != null && antonymArray.isArray()) {
+            antonymArray.forEach(n -> antonymList.add(n.asText()));
         }
 
-        // DTO 생성 및 반환
+        // 최종 DTO 반환
         return MeansResponseDto.builder()
                 .word(wordText)
-                .pos(pos)
-                .definition(definition)
+                .meanings(meaningList)
                 .synonym(synonymList)
                 .antonym(antonymList)
                 .build();
     }
 
-    // 내부 클래스: 요청 포맷
+    // 내부 클래스: 요청 본문 구조 정의
     static class EtriRequest {
         public EtriArgument argument;
 

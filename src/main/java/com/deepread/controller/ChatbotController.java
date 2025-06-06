@@ -4,6 +4,7 @@ import com.deepread.dto.request.ChatbotLogRequestDto;
 import com.deepread.dto.response.ChatbotLogResponseDto;
 import com.deepread.dto.response.ErrorResponse;
 import com.deepread.dto.response.MeansResponseDto;
+import com.deepread.dto.response.MeansResponseDto.MeaningDetail;
 import com.deepread.service.ChatbotService;
 import com.deepread.service.OpenAPIService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Tag(name = "Chatbot", description = "단어 의미 조회 및 로그 저장 API")
 @RestController
@@ -65,10 +67,18 @@ public class ChatbotController {
         try {
             MeansResponseDto meaningDto = openAPIService.getMeans(word);
 
+            // 첫 번째 의미만 챗봇 응답용으로 사용
+            List<MeaningDetail> meanings = meaningDto.getMeanings();
+            if (meanings == null || meanings.isEmpty()) {
+                return buildError("단어 의미가 존재하지 않습니다.", request);
+            }
+
+            String firstDefinition = meanings.get(0).getDefinition();
+
             ChatbotLogRequestDto dto = new ChatbotLogRequestDto();
             dto.setUserId(userId);
             dto.setWord(word);
-            dto.setResponse(meaningDto.getDefinition());
+            dto.setResponse(firstDefinition);
 
             ChatbotLogResponseDto saved = chatbotService.saveChatbotLog(dto);
 
