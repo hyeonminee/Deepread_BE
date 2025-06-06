@@ -52,6 +52,7 @@ public class OpenAPIService {
                 response.append(responseLine.trim());
             }
         }
+        log.info("ETRI 응답 원본: {}", response);
 
         JsonNode root = objectMapper.readTree(response.toString());
 
@@ -84,10 +85,6 @@ public class OpenAPIService {
             throw new IOException("POS 또는 Definition 누락");
         }
 
-        // 선택 정보
-        String hanja = info.path("Origin").asText(""); // 없으면 빈 문자열
-        String example = info.path("Example").asText("");
-
         // 유의어/반의어 파싱
         List<String> synonymList = new ArrayList<>();
         JsonNode synArray = returnObject.path("WWN WordInfo").get(0).path("Synonym");
@@ -106,8 +103,6 @@ public class OpenAPIService {
                 .word(wordText)
                 .pos(pos)
                 .definition(definition)
-                .hanja(hanja)
-                .example(example)
                 .synonym(synonymList)
                 .antonym(antonymList)
                 .build();

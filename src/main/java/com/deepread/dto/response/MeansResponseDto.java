@@ -22,12 +22,6 @@ public class MeansResponseDto {
     @Schema(description = "단어의 정의", example = "잘못한 일이나 실수에 대해 용서를 빎.")
     private String definition;
 
-    @Schema(description = "한자 표기", example = "謝過")
-    private String hanja;
-
-    @Schema(description = "예문", example = "그는 사과 한 마디 없이 나가 버렸다.")
-    private String example;
-
     @Schema(description = "유의어 목록", example = "[\"사죄\", \"해명\"]")
     private List<String> synonym;
 

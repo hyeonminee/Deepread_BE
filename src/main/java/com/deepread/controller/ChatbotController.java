@@ -31,7 +31,7 @@ public class ChatbotController {
     private final OpenAPIService openAPIService;
 
     @GetMapping("/meaning")
-    @Operation(summary = "단어 전체 의미 조회 (관리자)", description = "단어의 뜻, 품사, 한자, 예문, 유의어, 반의어를 모두 포함한 정보를 반환합니다.")
+    @Operation(summary = "단어 전체 의미 조회 (관리자)", description = "단어의 뜻, 품사, 유의어, 반의어를 모두 포함한 정보를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "단어 전체 의미 조회 성공",
                     content = @Content(schema = @Schema(implementation = MeansResponseDto.class))),
@@ -85,36 +85,6 @@ public class ChatbotController {
             return ResponseEntity.ok(saved);
         } catch (IOException e) {
             return buildError("단어 의미를 조회하는 중 오류가 발생했습니다.", request);
-        }
-    }
-
-    @GetMapping("/hanja")
-    @Operation(summary = "한자 뜻풀이 반환", description = "단어의 한자어 표기를 반환합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "한자 반환 성공"),
-            @ApiResponse(responseCode = "500", description = "한자 반환 실패",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    public ResponseEntity<?> getHanja(@RequestParam String word, HttpServletRequest request) {
-        try {
-            return ResponseEntity.ok(openAPIService.getMeans(word).getHanja());
-        } catch (IOException e) {
-            return buildError("한자 정보를 가져오는 중 오류가 발생했습니다.", request);
-        }
-    }
-
-    @GetMapping("/example")
-    @Operation(summary = "예문 반환", description = "단어에 대한 예문을 반환합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "예문 반환 성공"),
-            @ApiResponse(responseCode = "500", description = "예문 반환 실패",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    public ResponseEntity<?> getExample(@RequestParam String word, HttpServletRequest request) {
-        try {
-            return ResponseEntity.ok(openAPIService.getMeans(word).getExample());
-        } catch (IOException e) {
-            return buildError("예문을 가져오는 중 오류가 발생했습니다.", request);
         }
     }
 
