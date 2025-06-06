@@ -27,9 +27,11 @@ public class OpenAPIService {
 
     @Transactional(readOnly = true)
     public MeansResponseDto getMeans(String word) throws IOException {
+        // 요청 JSON 생성
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(new EtriRequest(new EtriArgument(word)));
 
+        // HTTP POST 요청 설정
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -37,65 +39,69 @@ public class OpenAPIService {
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.setDoOutput(true);
 
+        // 요청 본문 전송
         try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
-            os.write(input);
+            os.write(requestBody.getBytes(StandardCharsets.UTF_8));
         }
 
+        // 응답 수신
         StringBuilder response = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
             String responseLine;
             while ((responseLine = br.readLine()) != null) {
                 response.append(responseLine.trim());
             }
         }
 
-        log.info("ETRI 응답 원본: {}", response.toString());
-
-
         JsonNode root = objectMapper.readTree(response.toString());
+
+        // result code 확인
+        int resultCode = root.path("result").asInt(-1);
+        if (resultCode != 0) {
+            throw new IOException("ETRI API 응답 실패 (result=" + resultCode + ")");
+        }
+
+        // return_object 확인
         JsonNode returnObject = root.path("return_object");
         if (returnObject.isMissingNode()) {
-            throw new IOException("Invalid API response: 'return_object' 없음");
+            throw new IOException("'return_object' 없음");
         }
 
-        JsonNode wordInfoNode = returnObject.path("WordInfo");
-        if (!wordInfoNode.isArray() || wordInfoNode.isEmpty()) {
-            throw new IOException("단어 정보가 존재하지 않습니다.");
+        // Word와 WordInfo 리스트 추출
+        String wordText = returnObject.path("WWN WordInfo").get(0).path("Word").asText(null);
+        JsonNode wordInfoArray = returnObject.path("WWN WordInfo").get(0).path("WordInfo");
+
+        if (wordText == null || wordInfoArray == null || !wordInfoArray.isArray() || wordInfoArray.isEmpty()) {
+            throw new IOException("단어 정보 누락");
         }
-        JsonNode info = wordInfoNode.get(0);
 
-        String wordText = returnObject.path("Word").asText();
-        String pos = info.path("POS").asText();
-        String definition = info.path("Definition").asText();
-        String hanja = info.path("Origin").asText();
-        String example = info.path("Example").asText();
+        JsonNode info = wordInfoArray.get(0); // 첫 번째 의미 사용
 
-        // Synonym, Antonym은 JSON 문자열로 들어오기 때문에 재파싱 필요
+        // 필수 정보 파싱 (null or blank 확인)
+        String pos = info.path("POS").asText(null);
+        String definition = info.path("Definition").asText(null);
+        if (pos == null || pos.isBlank() || definition == null || definition.isBlank()) {
+            throw new IOException("POS 또는 Definition 누락");
+        }
+
+        // 선택 정보
+        String hanja = info.path("Origin").asText(""); // 없으면 빈 문자열
+        String example = info.path("Example").asText("");
+
+        // 유의어/반의어 파싱
         List<String> synonymList = new ArrayList<>();
+        JsonNode synArray = returnObject.path("WWN WordInfo").get(0).path("Synonym");
+        if (synArray != null && synArray.isArray()) {
+            synArray.forEach(n -> synonymList.add(n.asText()));
+        }
+
         List<String> antonymList = new ArrayList<>();
-
-        try {
-            String synRaw = info.path("Synonym").asText();
-            JsonNode synArray = objectMapper.readTree(synRaw);
-            if (synArray.isArray()) {
-                synArray.forEach(n -> synonymList.add(n.asText()));
-            }
-        } catch (Exception e) {
-            // syn 파싱 실패 시 무시
+        JsonNode antArray = returnObject.path("WWN WordInfo").get(0).path("Antonym");
+        if (antArray != null && antArray.isArray()) {
+            antArray.forEach(n -> antonymList.add(n.asText()));
         }
 
-        try {
-            String antRaw = info.path("Antonym").asText();
-            JsonNode antArray = objectMapper.readTree(antRaw);
-            if (antArray.isArray()) {
-                antArray.forEach(n -> antonymList.add(n.asText()));
-            }
-        } catch (Exception e) {
-            // ant 파싱 실패 시 무시
-        }
-
+        // DTO 생성 및 반환
         return MeansResponseDto.builder()
                 .word(wordText)
                 .pos(pos)
