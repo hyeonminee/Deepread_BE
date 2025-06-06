@@ -24,6 +24,12 @@ public class ChatbotService {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
 
+        // 중복 여부 확인 후 저장
+        boolean alreadyExists = chatbotLogRepository.existsByUser_IdAndWord(user.getId(), dto.getWord());
+        if (alreadyExists) {
+            return null; // 이미 있음
+        }
+
         ChatbotLog log = new ChatbotLog();
         log.setUser(user);
         log.setWord(dto.getWord());
@@ -34,5 +40,9 @@ public class ChatbotService {
         responseDto.setUserId(saved.getUser().getId());
 
         return responseDto;
+    }
+
+    public boolean isWordAlreadyQueried(Long userId, String word) {
+        return chatbotLogRepository.existsByUser_IdAndWord(userId, word);
     }
 }

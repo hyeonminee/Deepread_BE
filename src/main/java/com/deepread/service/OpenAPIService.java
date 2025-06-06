@@ -1,73 +1,105 @@
 package com.deepread.service;
 
-import com.deepread.dto.request.MeansReq;
-import com.deepread.dto.response.MeansRes;
 import com.deepread.dto.response.MeansResponseDto;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONObject;
-import org.json.XML;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
 public class OpenAPIService {
 
-    private final String key = "66745AFF64C80B68E135A40C58CC1A40";
+    // ETRI API 인증키
+    private final String accessKey = "REMOVED";
 
+    // ETRI 어휘 정보 API 호출 URL
+    private final String apiUrl = "http://aiopen.etri.re.kr:8000/WiseWWN/Word";
+
+    // 입력된 단어의 의미를 ETRI 어휘 정보 API를 통해 조회
     @Transactional(readOnly = true)
     public MeansResponseDto getMeans(String word) throws IOException {
-        String baseUrl = "https://stdict.korean.go.kr/api/search.do";
-        String encodedWord = URLEncoder.encode(word, StandardCharsets.UTF_8);
+        // JSON 요청 본문 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(
+                new EtriRequest(new EtriArgument(word))
+        );
 
-        MeansReq req = new MeansReq(key, encodedWord);
-        StringBuilder result = new StringBuilder();
+        // HTTP POST 요청 생성
+        URL url = new URL(apiUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Authorization", accessKey);
+        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        connection.setDoOutput(true); // 요청 본문 전송 가능 설정
 
-        URL url = new URL(baseUrl + req.getParameter());
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("GET");
-        urlConnection.connect();
-
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8));
-        String returnLine;
-        while ((returnLine = bufferedReader.readLine()) != null) {
-            result.append(returnLine);
+        // 요청 본문 전송
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
+            os.write(input);
         }
 
-        JSONObject jsonObject = XML.toJSONObject(result.toString());
-
-        ObjectMapper mapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-                .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-
-        MeansRes meansRes = mapper.readValue(jsonObject.toString(), MeansRes.class);
-
-        if (meansRes.getChannel().getItem() == null || meansRes.getChannel().getItem().isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 단어입니다.");
+        // 응답 수신
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+            String responseLine;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
         }
 
-        MeansRes.Item item = meansRes.getChannel().getItem().get(0);
-        MeansRes.Sense sense = item.getSense().get(0);
+        // 응답 JSON 파싱
+        JsonNode root = objectMapper.readTree(response.toString());
+        JsonNode returnObject = root.path("return_object");
 
+        // 응답 오류 처리
+        if (returnObject.isMissingNode()) {
+            throw new IOException("Invalid API response");
+        }
+
+        // 단어 정보 필드 추출
+        String wordText = returnObject.path("Word").asText();                       // 단어
+        String pos = returnObject.path("WordInfo").path("POS").asText();           // 품사
+        String definition = returnObject.path("WordInfo").path("Definition").asText(); // 뜻풀이
+        String hanja = returnObject.path("WordInfo").path("Origin").asText();      // 한자
+        String example = returnObject.path("WordInfo").path("Example").asText();   // 예문
+        String synonym = returnObject.path("Synonym").toString();                  // 유의어
+        String antonym = returnObject.path("Antonym").toString();                  // 반의어
+
+        // DTO로 변환 후 반환
         return MeansResponseDto.builder()
-                .word(item.getWord())
-                .pos(item.getPos())
-                .definition(sense.getDefinition())
-                .type(sense.getType())
-                .link(sense.getLink())
+                .word(wordText)
+                .pos(pos)
+                .definition(definition)
+                .hanja(hanja)
+                .example(example)
+                .synonym(synonym)
+                .antonym(antonym)
                 .build();
+    }
+
+    // 내부 클래스: 요청 본문 포맷 정의
+    static class EtriRequest {
+        public EtriArgument argument;
+
+        public EtriRequest(EtriArgument argument) {
+            this.argument = argument;
+        }
+    }
+
+    // 내부 클래스: 단어 인자를 포함한 구조
+    static class EtriArgument {
+        public String word;
+
+        public EtriArgument(String word) {
+            this.word = word;
+        }
     }
 }
