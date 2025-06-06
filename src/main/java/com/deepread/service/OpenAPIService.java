@@ -20,8 +20,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -68,10 +66,8 @@ public class OpenAPIService {
                 .word(item.getWord())
                 .pos(item.getPos())
                 .definition(sense.getDefinition())
-                .pattern(sense.getPattern())
-                .example(sense.getExample())
-                .proverb(sense.getProverb())
-                .usage(sense.getUsage())
+                .type(sense.getType())
+                .link(sense.getLink())
                 .build();
     }
 }

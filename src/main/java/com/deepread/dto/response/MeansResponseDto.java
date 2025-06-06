@@ -3,30 +3,25 @@ package com.deepread.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
-@Schema(description = "단어 의미 응답 DTO")
 public class MeansResponseDto {
 
     @Schema(description = "단어", example = "사과")
     private String word;
 
-    @Schema(description = "구분 (고유어/한자어 등)", example = "고유어")
+    @Schema(description = "품사", example = "명사")
     private String pos;
 
-    @Schema(description = "뜻풀이", example = "먹을 수 있는 붉은색 열매")
+    @Schema(description = "뜻풀이", example = "사람이나 사물의 잘못을 꾸짖거나 노여워함.")
     private String definition;
 
-    @Schema(description = "문형", example = "~을 하다")
-    private String pattern;
+    @Schema(description = "어휘 구분", example = "고유어, 한자어 등")
+    private String type;
 
-    @Schema(description = "용례", example = "사과를 먹었다.")
-    private String example;
-
-    @Schema(description = "관용구 또는 속담", example = "사과도 때가 있다.")
-    private String proverb;
-
-    @Schema(description = "용법 또는 사용범위", example = "일상어")
-    private String usage;
+    @Schema(description = "자세한 뜻, 예문 등을 볼 수 있는 링크", example = "https://stdict.korean.go.kr/search/searchView.do?word_no=404765&searchKeywordTo=3")
+    private String link;
 }
