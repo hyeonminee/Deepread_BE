@@ -88,7 +88,7 @@ app:
 
 flask:
   api:
-    url: http://3.35.42.252:5000
+    url: http://3.35.200.173:5000
 
 springdoc:
   api-docs:
