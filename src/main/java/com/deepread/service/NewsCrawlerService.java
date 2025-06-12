@@ -1,6 +1,8 @@
 package com.deepread.service;
 
+import com.deepread.entity.Content;
 import com.deepread.entity.NewsArticle;
+import com.deepread.repository.ContentRepository;
 import com.deepread.repository.NewsArticleRepository;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
@@ -21,6 +23,7 @@ public class NewsCrawlerService {
     private static final Logger log = LoggerFactory.getLogger(NewsCrawlerService.class);
 
     private final NewsArticleRepository newsArticleRepository;
+    private final ContentRepository contentRepository;
 
     private final Map<String, String> categoryMap = Map.of(
             "경제", "https://www.yna.co.kr/economy/index?site=navi_economy_depth01",
@@ -68,15 +71,27 @@ public class NewsCrawlerService {
                 String content = detailDoc.select("div.story-news p").eachText().stream()
                         .reduce("", (acc, p) -> acc + "\n" + p);
 
-                // AI 요약 없이 저장 (aiSummary = null)
                 NewsArticle article = new NewsArticle();
                 article.setCategory(category);
                 article.setTitle(title);
                 article.setContent(content);
-                article.setAiSummary(null); // 요약 없이 저장. 요약은 나중에 진행
+                article.setAiSummary(null);
                 article.setOriginalUrl(newsUrl);
 
-                newsArticleRepository.save(article);
+                NewsArticle savedArticle = newsArticleRepository.save(article);
+
+                // Content 테이블에 등록
+                boolean exists = contentRepository.existsByCategoryAndExternalId("NEWS", savedArticle.getId());
+                if (!exists) {
+                    Content contentEntity = Content.builder()
+                            .category("NEWS")
+                            .externalId(savedArticle.getId())
+                            .title(savedArticle.getTitle())
+                            .summarySourceType("CRAWL")
+                            .build();
+                    contentRepository.save(contentEntity);
+                }
+
                 savedCount++;
                 log.info("[저장 완료] 카테고리: {}, 제목: {}", category, title);
 

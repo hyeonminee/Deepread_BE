@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ContentRepository extends JpaRepository<Content, Long> {
 //    List<Content> findByLevel(Level level);
+    boolean existsByCategoryAndExternalId(String category, Long externalId);
 }
