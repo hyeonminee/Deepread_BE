@@ -4,6 +4,7 @@ import com.deepread.dto.request.SummaryRequestDto;
 import com.deepread.dto.response.LiteracyReportDto;
 import com.deepread.dto.response.SummaryResponseDto;
 import com.deepread.dto.response.SummarySimpleDto;
+import com.deepread.entity.Summary;
 import com.deepread.entity.SummaryFeedback;
 import com.deepread.service.SummaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,7 @@ import java.util.Optional;
 public class SummaryController {
 
     private final SummaryService summaryService;
+    private final ModelMapper modelMapper;
 
     @PostMapping
     @Operation(summary = "요약 저장", description = "사용자가 작성한 요약을 저장하고 AI 평가를 수행함")
@@ -46,7 +49,10 @@ public class SummaryController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     public ResponseEntity<SummaryResponseDto> getSummary(@PathVariable Long id) {
-        return ResponseEntity.ok(summaryService.getSummary(id));
+        Summary summary = summaryService.getSummaryEntity(id);
+        SummaryResponseDto dto = modelMapper.map(summary, SummaryResponseDto.class);
+        dto.setContentSnapshot(null); // 원문 제거
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/feedback/{summaryId}")

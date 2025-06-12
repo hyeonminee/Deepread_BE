@@ -190,4 +190,10 @@ public class SummaryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Summary not found"));
         return summary.getContentSnapshot();
     }
+
+    // Summary 엔티티 직접 반환
+    public Summary getSummaryEntity(Long summaryId) {
+        return summaryRepository.findById(summaryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Summary not found"));
+    }
 }

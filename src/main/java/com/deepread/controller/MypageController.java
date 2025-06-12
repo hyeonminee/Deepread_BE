@@ -1,9 +1,7 @@
 package com.deepread.controller;
 
-import com.deepread.dto.response.MypageStatisticsDto;
-import com.deepread.dto.response.UserCalendarDto;
-import com.deepread.dto.response.SummaryResponseDto;
-import com.deepread.dto.response.LiteracyReportDto;
+import com.deepread.dto.response.*;
+import com.deepread.entity.Summary;
 import com.deepread.service.MypageService;
 import com.deepread.service.SummaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,15 +23,22 @@ public class MypageController {
     private final SummaryService summaryService;
     private final MypageService mypageService;
 
-    @Operation(summary = "요약 상세 조회", description = "요약 ID로 상세 정보(userSummary, aiSummary 등) 반환")
+    @Operation(summary = "마이페이지 요약 상세 조회", description = "userSummary, aiSummary, score, feedback, 원문) 반환")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "요약 ID를 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @GetMapping("/summary/{id}")
-    public SummaryResponseDto getSummaryDetail(@PathVariable Long id) {
-        return summaryService.getSummary(id);
+    public MypageSummaryDetailDto getSummaryForMypage(@PathVariable Long id) {
+        Summary summary = summaryService.getSummaryEntity(id);
+        MypageSummaryDetailDto dto = new MypageSummaryDetailDto();
+        dto.setUserSummary(summary.getUserSummary());
+        dto.setAiSummary(summary.getAiSummary());
+        dto.setScore(summary.getScore());
+        dto.setFeedback(summary.getFeedback());
+        dto.setContentSnapshot(summary.getContentSnapshot());
+        return dto;
     }
 
     @Operation(summary = "요약 원문 보기", description = "요약 ID로 원문 스냅샷 반환")
