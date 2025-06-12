@@ -3,6 +3,7 @@ package com.deepread.controller;
 import com.deepread.dto.response.MedicalArticleResponseDto;
 import com.deepread.dto.response.MedicalArticleUploadResponseDto;
 import com.deepread.entity.User;
+import com.deepread.oauth.CustomPrincipal;
 import com.deepread.service.MedicalArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,13 +26,15 @@ public class MedicalArticleController {
 
     private final MedicalArticleService medicalArticleService;
 
-    @Operation(summary = "의료 콘텐츠 전체 조회", description = "의료 카드뉴스용 콘텐츠 전체 목록을 반환한다.")
+    @Operation(summary = "의료 콘텐츠 조회", description = "로그인한 사용자의 레벨에 해당하는 콘텐츠만 반환")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공")
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패")
     })
     @GetMapping
-    public List<MedicalArticleResponseDto> getAll() {
-        return medicalArticleService.getAllArticles();
+    public List<MedicalArticleResponseDto> getByUserLevel(@AuthenticationPrincipal CustomPrincipal principal) {
+        User.Level level = principal.getUser().getLevel();
+        return medicalArticleService.getArticlesByLevel(level);
     }
 
     @GetMapping("/level")
