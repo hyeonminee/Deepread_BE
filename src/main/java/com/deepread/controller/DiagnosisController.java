@@ -6,6 +6,7 @@ import com.deepread.dto.response.DiagnosisEvaluationResponseDto;
 import com.deepread.dto.response.DiagnosisQuestionResponseDto;
 import com.deepread.dto.response.DiagnosisResultResponseDto;
 import com.deepread.entity.DiagnosisQuestion;
+import com.deepread.entity.User;
 import com.deepread.repository.DiagnosisQuestionRepository;
 import com.deepread.service.DiagnosisQuestionService;
 import com.deepread.service.DiagnosisService;
@@ -63,33 +64,51 @@ public class DiagnosisController {
         return ResponseEntity.ok(diagnosisQuestionService.getMixedQuestions());
     }
 
+    @PostMapping("/evaluate")
     @Operation(
             summary = "문해력 진단 결과 평가",
-            description = "사용자 응답을 기반으로 정답 여부를 판단하고 점수를 계산한다. 반환 결과는 각 문항별 정답 여부 리스트와 점수이다."
+            description = "사용자 응답을 기반으로 정답 여부를 판단하고 점수를 계산하며, 문해력 수준을 판정한다. (DB 저장은 하지 않음)" +
+                    "0~40 점 : 초급, 41~75 점 : 중급, 76 ~ 100 점 : 고급"
+
+
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "평가 완료 및 점수 반환"),
+            @ApiResponse(responseCode = "200", description = "평가 완료 및 점수 및 수준 반환"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청"),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
-    @PostMapping("/evaluate")
     public ResponseEntity<DiagnosisEvaluationResponseDto> evaluateAnswers(@RequestBody DiagnosisEvaluationRequestDto dto) {
-        int correctCount = 0;
-        List<Boolean> results = new ArrayList<>();
+        int totalScore = 0;
 
-        for (DiagnosisEvaluationRequestDto.AnswerSubmission submission : dto.getAnswers()) {
+        // 문제별 배점 (사용자가 항상 5개 문항을 동일한 순서로 제출한다고 가정)
+        int[] weights = {10, 15, 15, 30, 30};
+
+        List<DiagnosisEvaluationRequestDto.AnswerSubmission> answers = dto.getAnswers();
+        for (int i = 0; i < answers.size(); i++) {
+            DiagnosisEvaluationRequestDto.AnswerSubmission submission = answers.get(i);
+
             DiagnosisQuestion question = questionRepository.findById(submission.getId())
                     .orElseThrow(() -> new IllegalArgumentException("문항 ID " + submission.getId() + "를 찾을 수 없습니다."));
+
             boolean isCorrect = question.getAnswer().equals(submission.getAnswer());
-            results.add(isCorrect);
-            if (isCorrect) correctCount++;
+            if (isCorrect) {
+                totalScore += weights[i];
+            }
         }
 
         DiagnosisEvaluationResponseDto res = new DiagnosisEvaluationResponseDto();
-        res.setScore(correctCount * 20);
-        res.setResults(results);
+        res.setScore(totalScore);
+        res.setUserLevel(determineLevel(totalScore));
+
         return ResponseEntity.ok(res);
     }
+
+    private User.Level determineLevel(int score) {
+        if (score <= 40) return User.Level.초급;
+        else if (score <= 75) return User.Level.중급;
+        else return User.Level.고급;
+    }
+
 
     @Operation(
             summary = "문해력 진단 문제 일괄 등록",

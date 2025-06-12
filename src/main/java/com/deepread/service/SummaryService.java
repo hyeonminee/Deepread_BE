@@ -64,7 +64,7 @@ public class SummaryService {
 
         // AI 평가 요청
         RestTemplate restTemplate = new RestTemplate();
-        String aiUrl = "http://3.35.42.252:5000/evaluate";
+        String aiUrl = "http://3.35.200.173:5000/evaluate";
 
         Map<String, String> payload = new HashMap<>();
         payload.put("text", originalText);
