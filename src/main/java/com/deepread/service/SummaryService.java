@@ -103,10 +103,14 @@ public class SummaryService {
         ResponseEntity<Map> response = restTemplate.postForEntity(flaskBaseUrl + "/evaluate", requestEntity, Map.class);
 
         // 6. 응답 결과(score, feedback) 파싱
-        Integer score;
+        Double score;
         String feedback;
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            score = (Integer) response.getBody().get("score");
+            Object scoreObj = response.getBody().get("score");
+            if (!(scoreObj instanceof Number)) {
+                throw new CustomEvaluationException("AI 평가 서버에서 score가 Number 타입이 아님: " + scoreObj);
+            }
+            score = ((Number) scoreObj).doubleValue();
             feedback = (String) response.getBody().get("feedback");
         } else {
             throw new CustomEvaluationException("AI 평가 서버 응답 오류: " + response.getStatusCode());
