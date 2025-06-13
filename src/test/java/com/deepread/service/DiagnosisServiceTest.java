@@ -29,10 +29,7 @@ class DiagnosisServiceTest {
     void setUp() {
         diagnosisResultRepository = mock(DiagnosisResultRepository.class);
         userRepository = mock(UserRepository.class);
-
-        // ✅ 설정된 ModelMapper 사용
         modelMapper = new ModelMapperConfig().modelMapper();
-
         diagnosisService = new DiagnosisService(diagnosisResultRepository, userRepository, modelMapper);
     }
 
@@ -79,15 +76,15 @@ class DiagnosisServiceTest {
         DiagnosisResultRequestDto requestDto = new DiagnosisResultRequestDto();
         requestDto.setUserId(invalidUserId);
         requestDto.setScore(50);
+        requestDto.setUserLevel(User.Level.초급);
 
         when(userRepository.findById(invalidUserId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(ResourceNotFoundException.class, () -> {
-            diagnosisService.submitDiagnosisResult(requestDto);
-        });
+        assertThrows(ResourceNotFoundException.class, () ->
+                diagnosisService.submitDiagnosisResult(requestDto));
 
         verify(userRepository).findById(invalidUserId);
-        verify(diagnosisResultRepository, never()).save(any(DiagnosisResult.class));
+        verify(diagnosisResultRepository, never()).save(any());
     }
 }

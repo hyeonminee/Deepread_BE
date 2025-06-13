@@ -18,7 +18,7 @@ public class MypageSummaryDetailDto {
     @Schema(description = "AI가 평가한 점수", example = "88.9")
     private Double score;
 
-    @Schema(description = "AI 피드백 문장", example = "핵심 내용을 잘 요약하였습니다.")
+    @Schema(description = "AI 피드백 문장", example = "핵심 내용을 잘 요약하였습니다...")
     private String feedback;
 
     @Schema(description = "요약 당시 저장된 원문", example = "세금 신고는 매년 5월 말까지 ...")

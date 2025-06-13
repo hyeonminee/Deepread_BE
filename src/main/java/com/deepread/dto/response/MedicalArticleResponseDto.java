@@ -27,6 +27,6 @@ public class MedicalArticleResponseDto {
     @Schema(description = "문해력 수준", example = "고급")
     private User.Level level;
 
-    @Schema(description = "Summary 저장용 콘텐츠 ID (Content 테이블 PK)", example = "123")
+    @Schema(description = "연결된 콘텐츠 ID (Summary 저장 시 사용)", example = "12")
     private Long contentId;
 }

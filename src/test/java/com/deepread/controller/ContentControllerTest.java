@@ -1,5 +1,9 @@
 package com.deepread.controller;
 
+import com.deepread.dto.response.LawArticleResponseDto;
+import com.deepread.dto.response.MedicalArticleResponseDto;
+import com.deepread.dto.response.NewsArticleResponseDto;
+import com.deepread.dto.response.RecommendedArticlesDto;
 import com.deepread.entity.Content;
 import com.deepread.entity.User;
 import com.deepread.service.ContentService;
@@ -38,19 +42,25 @@ class ContentControllerTest {
     @WithMockUser
     @DisplayName("레벨에 따라 콘텐츠 추천 성공")
     void getRecommendedContents_success() throws Exception {
-        Content content1 = new Content();
-        content1.setId(1L);
-        content1.setTitle("초급 콘텐츠 1");
+        RecommendedArticlesDto dto = RecommendedArticlesDto.builder()
+                .lawArticles(List.of(new LawArticleResponseDto(1L, "법률 제목", "...")))
+                .medicalArticles(List.of(new MedicalArticleResponseDto(2L, "의료 제목", "...")))
+                .newsArticles(List.of(new NewsArticleResponseDto(3L, "뉴스 제목", "...")))
+                .build();
 
-        when(contentService.getRecommendedContents(User.Level.초급))
-                .thenReturn(List.of(content1));
+        User mockUser = new User();
+        mockUser.setId(1L);
+
+        when(recommendationService.getRecommendedArticles(any(Long.class))).thenReturn(dto);
 
         mockMvc.perform(get("/api/contents/recommend")
-                        .param("level", "초급")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .principal(() -> "user")) // OAuth mock 대신 Principal 제공
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("초급 콘텐츠 1"));
+                .andExpect(jsonPath("$.lawArticles[0].title").value("법률 제목"))
+                .andExpect(jsonPath("$.medicalArticles[0].title").value("의료 제목"))
+                .andExpect(jsonPath("$.newsArticles[0].title").value("뉴스 제목"));
     }
+
 
     @Test
     @WithMockUser

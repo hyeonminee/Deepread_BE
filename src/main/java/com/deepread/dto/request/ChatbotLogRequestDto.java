@@ -8,6 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(description = "챗봇 로그 저장 요청 DTO")
 public class ChatbotLogRequestDto {
 
     @Schema(description = "사용자 ID", example = "1")

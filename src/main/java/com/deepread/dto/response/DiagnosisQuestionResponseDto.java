@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class DiagnosisQuestionResponseDto {
 
-    @Schema(description = "질문 ID", example = "1001")
+    @Schema(description = "질문 ID", example = "5")
     private Long id;
 
     @Schema(description = "문제 유형", example = "A")

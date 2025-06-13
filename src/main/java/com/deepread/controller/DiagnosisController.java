@@ -69,8 +69,6 @@ public class DiagnosisController {
             summary = "문해력 진단 결과 평가",
             description = "사용자 응답을 기반으로 정답 여부를 판단하고 점수를 계산하며, 문해력 수준을 판정한다. (DB 저장은 하지 않음)" +
                     "0~40 점 : 초급, 41~75 점 : 중급, 76 ~ 100 점 : 고급"
-
-
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "평가 완료 및 점수 및 수준 반환"),

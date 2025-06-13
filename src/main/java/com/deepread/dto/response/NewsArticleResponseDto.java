@@ -32,6 +32,6 @@ public class NewsArticleResponseDto {
     @Schema(description = "기사 수집 일시", example = "2025-06-01T07:30:00")
     private LocalDateTime createdAt;
 
-    @Schema(description = "Summary 저장용 콘텐츠 ID (Content 테이블 PK)", example = "123")
+    @Schema(description = "연결된 콘텐츠 ID (Summary 저장 시 사용)", example = "12")
     private Long contentId;
 }

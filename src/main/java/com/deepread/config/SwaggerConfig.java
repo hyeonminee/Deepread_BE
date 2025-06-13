@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(
                 title = "DeepRead API",
                 version = "v1",
-                description = "DeepRead Backend API 문서"
+                description = "AI 기반 문해력 훈련 플랫폼 API 문서"
         )
 )
 @SecurityScheme(

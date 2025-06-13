@@ -9,6 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(description = "진단 결과 저장 요청 DTO")
 public class DiagnosisResultRequestDto {
 
     @Schema(description = "사용자 ID", example = "1")
@@ -20,7 +21,7 @@ public class DiagnosisResultRequestDto {
     @Min(value = 0, message = "점수는 0 이상이어야 합니다.")
     private Integer score;
 
-    @Schema(description = "사용자의 문해력 수준", example = "BEGINNER")
+    @Schema(description = "사용자의 문해력 수준", example = "고급")
     @NotNull(message = "사용자 수준은 필수입니다.")
     private User.Level userLevel;
 }

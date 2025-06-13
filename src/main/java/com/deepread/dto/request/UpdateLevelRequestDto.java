@@ -8,6 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(description = "사용자 레벨 수정 요청 DTO")
 public class UpdateLevelRequestDto {
 
     @Schema(description = "새로운 사용자 레벨", example = "ADVANCED")

@@ -32,10 +32,10 @@ public class SummaryController {
     private final ModelMapper modelMapper;
 
     @PostMapping
-    @Operation(summary = "요약 저장", description = "사용자가 작성한 요약을 저장하고 AI 평가를 수행함")
+    @Operation(summary = "요약 저장 및 AI 평가", description = "사용자가 작성한 요약을 AI가 평가하여 점수 및 피드백을 저장한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "요약 저장 및 평가 성공"),
-            @ApiResponse(responseCode = "400", description = "요청 데이터 형식 오류"),
+            @ApiResponse(responseCode = "200", description = "평가 및 저장 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (예: 존재하지 않는 사용자/콘텐츠 ID)"),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     public ResponseEntity<SummaryResponseDto> saveSummary(@RequestBody SummaryRequestDto requestDto) {

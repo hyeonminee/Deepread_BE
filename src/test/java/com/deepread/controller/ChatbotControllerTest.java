@@ -36,12 +36,12 @@ class ChatbotControllerTest {
     void saveChatLog_success() throws Exception {
         ChatbotLogRequestDto requestDto = new ChatbotLogRequestDto();
         requestDto.setUserId(1L);
-        requestDto.setQuestion("질문입니다.");
+        requestDto.setWord("질문입니다.");
         requestDto.setResponse("응답입니다.");
 
         ChatbotLogResponseDto responseDto = new ChatbotLogResponseDto();
         responseDto.setUserId(1L);
-        responseDto.setQuestion("질문입니다.");
+        responseDto.setWord("질문입니다.");
         responseDto.setResponse("응답입니다.");
 
         Mockito.when(chatbotService.saveChatbotLog(any(ChatbotLogRequestDto.class)))
@@ -52,7 +52,7 @@ class ChatbotControllerTest {
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(1L))
-                .andExpect(jsonPath("$.question").value("질문입니다."))
+                .andExpect(jsonPath("$.word").value("질문입니다."))
                 .andExpect(jsonPath("$.response").value("응답입니다."));
     }
 
