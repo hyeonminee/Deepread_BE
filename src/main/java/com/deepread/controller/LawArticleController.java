@@ -2,8 +2,10 @@ package com.deepread.controller;
 
 import com.deepread.dto.response.LawArticleResponseDto;
 import com.deepread.dto.response.LawArticleUploadResponseDto;
+import com.deepread.entity.Content;
 import com.deepread.entity.User;
 import com.deepread.oauth.CustomPrincipal;
+import com.deepread.repository.ContentRepository;
 import com.deepread.service.LawArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +27,7 @@ import java.util.List;
 public class LawArticleController {
 
     private final LawArticleService lawArticleService;
+    private final ContentRepository contentRepository;
 
     @Operation(summary = "법률 콘텐츠 조회", description = "로그인한 사용자의 레벨에 해당하는 콘텐츠만 반환")
     @ApiResponses({
@@ -54,7 +57,19 @@ public class LawArticleController {
             @PathVariable Long id
     ) {
         return lawArticleService.getArticleById(id)
-                .map(ResponseEntity::ok)
+                .map(article -> {
+                    LawArticleResponseDto dto = LawArticleResponseDto.builder()
+                            .id(article.getId())
+                            .theme(article.getTheme())
+                            .content(article.getContent())
+                            .aiSummary(article.getAiSummary())
+                            .level(article.getLevel())
+                            .contentId(contentRepository.findByExternalIdAndCategory(article.getId(), "LAW")
+                                    .map(Content::getId)
+                                    .orElse(null)) // 없을 경우 null 허용
+                            .build();
+                    return ResponseEntity.ok(dto);
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 

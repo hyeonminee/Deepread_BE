@@ -1,7 +1,9 @@
 package com.deepread.controller;
 
 import com.deepread.dto.response.NewsArticleResponseDto;
+import com.deepread.entity.Content;
 import com.deepread.exception.ResourceNotFoundException;
+import com.deepread.repository.ContentRepository;
 import com.deepread.service.NewsArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +23,7 @@ import java.util.List;
 public class NewsArticleController {
 
     private final NewsArticleService newsArticleService;
+    private final ContentRepository contentRepository;
 
     @Operation(summary = "뉴스 기사 AI 요약 수행", description = "지정한 뉴스 기사 ID의 원문을 AI로 요약하고 DB에 저장한다.")
     @ApiResponses(value = {
@@ -59,7 +62,20 @@ public class NewsArticleController {
             @PathVariable Long id
     ) {
         return newsArticleService.getArticleById(id)
-                .map(ResponseEntity::ok)
+                .map(article -> {
+                    NewsArticleResponseDto dto = new NewsArticleResponseDto();
+                    dto.setId(article.getId());
+                    dto.setCategory(article.getCategory());
+                    dto.setTitle(article.getTitle());
+                    dto.setContent(article.getContent());
+                    dto.setAiSummary(article.getAiSummary());
+                    dto.setOriginalUrl(article.getOriginalUrl());
+                    dto.setCreatedAt(article.getCreatedAt());
+                    dto.setContentId(contentRepository.findByExternalIdAndCategory(article.getId(), "NEWS")
+                            .map(Content::getId)
+                            .orElse(null));
+                    return ResponseEntity.ok(dto);
+                })
                 .orElseThrow(() -> new ResourceNotFoundException("해당 뉴스 기사를 찾을 수 없습니다."));
     }
 
@@ -91,13 +107,16 @@ public class NewsArticleController {
         return newsArticleService.getTodayArticles();
     }
 
-    @Operation(summary = "오늘 뉴스 - 카테고리별 조회", description = "오늘 날짜 + 지정 카테고리의 뉴스 기사만 반환한다.")
+    @Operation(summary = "오늘 뉴스 - 카테고리별 단건 조회", description = "오늘 날짜 + 지정 카테고리의 뉴스 기사 1건을 상세정보로 반환한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "해당 카테고리 또는 오늘 뉴스 없음")
     })
     @GetMapping("/today/category/{category}")
-    public List<NewsArticleResponseDto> getTodayArticlesByCategory(@PathVariable String category) {
-        return newsArticleService.getTodayArticlesByCategory(category);
+    public ResponseEntity<NewsArticleResponseDto> getTodayArticleByCategory(@PathVariable String category) {
+        return newsArticleService.getSingleTodayArticleByCategory(category)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("오늘 날짜의 해당 카테고리 뉴스가 없습니다."));
     }
+
 }

@@ -2,8 +2,10 @@ package com.deepread.controller;
 
 import com.deepread.dto.response.MedicalArticleResponseDto;
 import com.deepread.dto.response.MedicalArticleUploadResponseDto;
+import com.deepread.entity.Content;
 import com.deepread.entity.User;
 import com.deepread.oauth.CustomPrincipal;
+import com.deepread.repository.ContentRepository;
 import com.deepread.service.MedicalArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +27,7 @@ import java.util.List;
 public class MedicalArticleController {
 
     private final MedicalArticleService medicalArticleService;
+    private final ContentRepository contentRepository;
 
     @Operation(summary = "의료 콘텐츠 조회", description = "로그인한 사용자의 레벨에 해당하는 콘텐츠만 반환")
     @ApiResponses(value = {
@@ -54,7 +57,19 @@ public class MedicalArticleController {
             @PathVariable Long id
     ) {
         return medicalArticleService.getArticleById(id)
-                .map(ResponseEntity::ok)
+                .map(article -> {
+                    MedicalArticleResponseDto dto = MedicalArticleResponseDto.builder()
+                            .id(article.getId())
+                            .theme(article.getTheme())
+                            .content(article.getContent())
+                            .aiSummary(article.getAiSummary())
+                            .level(article.getLevel())
+                            .contentId(contentRepository.findByExternalIdAndCategory(article.getId(), "MEDICAL")
+                                    .map(Content::getId)
+                                    .orElse(null))
+                            .build();
+                    return ResponseEntity.ok(dto);
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 
