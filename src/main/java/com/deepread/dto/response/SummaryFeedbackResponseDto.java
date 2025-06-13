@@ -1,11 +1,15 @@
 package com.deepread.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class SummaryFeedbackResponseDto {
 
     @Schema(description = "요약 점수", example = "88.2")

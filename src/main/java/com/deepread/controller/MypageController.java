@@ -31,13 +31,14 @@ public class MypageController {
     })
     @GetMapping("/summary/{id}")
     public MypageSummaryDetailDto getSummaryForMypage(@PathVariable Long id) {
+        // 요약 id로 summary 엔티티 조회
         Summary summary = summaryService.getSummaryEntity(id);
         MypageSummaryDetailDto dto = new MypageSummaryDetailDto();
-        dto.setUserSummary(summary.getUserSummary());
-        dto.setAiSummary(summary.getAiSummary());
-        dto.setScore(summary.getScore());
-        dto.setFeedback(summary.getFeedback());
-        dto.setContentSnapshot(summary.getContentSnapshot());
+        dto.setUserSummary(summary.getUserSummary()); // 사용자 요약
+        dto.setAiSummary(summary.getAiSummary()); // ai 요약
+        dto.setScore(summary.getScore()); // 점수
+        dto.setFeedback(summary.getFeedback()); // 피드백
+        dto.setContentSnapshot(summary.getContentSnapshot()); // 원문 복사본
         return dto;
     }
 
