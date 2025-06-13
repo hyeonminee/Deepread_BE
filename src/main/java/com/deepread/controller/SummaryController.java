@@ -2,6 +2,7 @@ package com.deepread.controller;
 
 import com.deepread.dto.request.SummaryRequestDto;
 import com.deepread.dto.response.LiteracyReportDto;
+import com.deepread.dto.response.SummaryFeedbackResponseDto;
 import com.deepread.dto.response.SummaryResponseDto;
 import com.deepread.dto.response.SummarySimpleDto;
 import com.deepread.entity.Summary;
@@ -62,10 +63,10 @@ public class SummaryController {
             @ApiResponse(responseCode = "404", description = "피드백이 존재하지 않음"),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
-    public ResponseEntity<SummaryFeedback> getFeedback(@PathVariable Long summaryId) {
-        Optional<SummaryFeedback> feedback = summaryService.getFeedbackBySummaryId(summaryId);
-        return feedback.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<SummaryFeedbackResponseDto> getFeedback(@PathVariable Long summaryId) {
+        return summaryService.getFeedbackBySummaryId(summaryId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/date/{userId}")
