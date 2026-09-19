@@ -7,9 +7,9 @@ spring:
     name: deepread-backend
 
   datasource:
-    url: jdbc:mysql://deepread-mysql:3306/deepread?serverTimezone=Asia/Seoul
-    username: root
-    password: REMOVED
+    url: ${DB_URL:jdbc:mysql://localhost:3306/deepread?serverTimezone=Asia/Seoul}
+    username: ${DB_USERNAME:deepread}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -28,7 +28,7 @@ spring:
       client:
         registration:
           kakao:
-            client-id: REMOVED
+            client-id: ${KAKAO_CLIENT_ID}
             client-authentication-method: post
             authorization-grant-type: authorization_code
             redirect-uri: "Ignored"
@@ -39,8 +39,8 @@ spring:
             provider: kakao
 
           naver:
-            client-id: REMOVED
-            client-secret: REMOVED
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_CLIENT_SECRET}
             authorization-grant-type: authorization_code
             redirect-uri: "Ignored"
             scope:
@@ -50,8 +50,8 @@ spring:
             provider: naver
 
           google:
-            client-id: REMOVED
-            client-secret: REMOVED
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             authorization-grant-type: authorization_code
             redirect-uri: "Ignored"
             scope:
@@ -73,22 +73,27 @@ spring:
             user-name-attribute: response
 
 jwt:
-  secret: REMOVED
+  secret: ${JWT_SECRET}
   access-token-expiration: 360000
   refresh-token-expiration: 1209600000
 
 custom:
   redirect:
-    app: myapp://oauth2/redirect
-    web: http://43.201.111.145:8080/login/
+    app: ${APP_REDIRECT_URI:myapp://oauth2/redirect}
+    web: ${WEB_REDIRECT_URI:http://localhost:8080/login/}
 
 app:
-  frontend-redirect-uri: https://auth.expo.io/@sbk03/adult-literacy-app
-  base-url: http://43.201.111.145:8080
+  frontend-redirect-uri: ${FRONTEND_REDIRECT_URI:http://localhost:8081}
+  base-url: ${APP_BASE_URL:http://localhost:8080}
 
 flask:
   api:
-    url: http://3.35.200.173:5000
+    url: ${FLASK_API_URL:http://localhost:5000}
+
+etri:
+  api:
+    key: ${ETRI_API_KEY}
+    url: ${ETRI_API_URL:http://aiopen.etri.re.kr:8000/WiseWWN/Word}
 
 springdoc:
   api-docs:

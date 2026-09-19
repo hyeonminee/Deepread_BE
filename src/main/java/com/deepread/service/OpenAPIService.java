@@ -4,9 +4,9 @@ import com.deepread.dto.response.MeansResponseDto;
 import com.deepread.dto.response.MeansResponseDto.MeaningDetail;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +18,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class OpenAPIService {
 
     private static final Logger log = LoggerFactory.getLogger(OpenAPIService.class);
 
-    // ETRI API 키와 URL
-    private final String accessKey = "REMOVED";
-    private final String apiUrl = "http://aiopen.etri.re.kr:8000/WiseWWN/Word";
+    private final String accessKey;
+    private final String apiUrl;
+
+    public OpenAPIService(
+            @Value("${etri.api.key}") String accessKey,
+            @Value("${etri.api.url}") String apiUrl
+    ) {
+        this.accessKey = accessKey;
+        this.apiUrl = apiUrl;
+    }
 
     /**
      * 주어진 단어에 대해 ETRI 어휘 API를 호출하여 뜻, 품사, 유의어, 반의어를 반환합니다.
